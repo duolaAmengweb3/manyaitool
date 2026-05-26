@@ -4,7 +4,7 @@ export function ClearButton({ onClear, label = "Clear" }: { onClear: () => void;
   return (
     <button
       onClick={onClear}
-      className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+      className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
     >
       {label}
     </button>

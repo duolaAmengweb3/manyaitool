@@ -1,14 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useToast } from "./Toast";
 
 export function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) {
-  const [copied, setCopied] = useState(false);
+  const toast = useToast();
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    toast("Copied to clipboard!");
   };
 
   return (
@@ -17,7 +16,7 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
       disabled={!text}
       className="px-4 py-2 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
     >
-      {copied ? "Copied!" : label}
+      {label}
     </button>
   );
 }

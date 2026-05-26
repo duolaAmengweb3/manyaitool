@@ -20,7 +20,7 @@ export function TextOutput({
         readOnly
         placeholder={placeholder}
         rows={rows}
-        className={`w-full p-3 border border-gray-200 rounded-lg bg-gray-50 resize-y outline-none ${
+        className={`w-full p-3 border border-slate-200 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-900/50 resize-y outline-none text-slate-900 dark:text-slate-100 placeholder-slate-400 ${
           monospace ? "font-mono text-sm" : ""
         }`}
       />

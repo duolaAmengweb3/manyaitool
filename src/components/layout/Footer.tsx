@@ -3,7 +3,7 @@ import { SITE_NAME } from "@/lib/constants";
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 mt-auto">
+    <footer className="bg-slate-900 dark:bg-slate-950 mt-auto">
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="grid sm:grid-cols-3 gap-8 mb-8">
           <div>
@@ -28,8 +28,9 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-slate-800 pt-6 text-center text-sm text-slate-500">
-          &copy; {new Date().getFullYear()} {SITE_NAME}. 100% private — all tools run in your browser.
+        <div className="border-t border-slate-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+          <span>&copy; {new Date().getFullYear()} {SITE_NAME}</span>
+          <span>100% private — all tools run in your browser. Press <kbd className="px-1.5 py-0.5 bg-slate-800 rounded text-slate-400 text-xs">⌘K</kbd> to search.</span>
         </div>
       </div>
     </footer>
