@@ -10,15 +10,15 @@ export function ToggleGroup({
   onChange: (v: string) => void;
 }) {
   return (
-    <div className="inline-flex rounded-lg border border-gray-300 overflow-hidden">
+    <div className="inline-flex rounded-lg border border-slate-200 overflow-hidden">
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
           className={`px-4 py-2 text-sm font-medium transition-colors ${
             value === opt.value
-              ? "bg-blue-600 text-white"
-              : "bg-white text-gray-700 hover:bg-gray-50"
+              ? "bg-indigo-600 text-white"
+              : "bg-white text-slate-600 hover:bg-slate-50"
           }`}
         >
           {opt.label}
