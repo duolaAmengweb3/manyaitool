@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "deploy": "npm run build && NO_PROXY='*' HTTP_PROXY='' HTTPS_PROXY='' ALL_PROXY='' npx wrangler pages deploy out --project-name=manyaitool --branch=main && bash scripts/notify-search-engines.sh"
   },
   "dependencies": {
     "gpt-tokenizer": "^3.4.0",
