@@ -54,8 +54,33 @@ export default function ToolPageClient({ slug }: { slug: string }) {
       <div className="space-y-12">
         <section>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">What is {tool.shortTitle}?</h2>
-          <p className="text-slate-600 dark:text-slate-300 leading-relaxed">{tool.content.whatIs}</p>
+          <div className="text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">
+            {tool.content.whatIs.split("\n\n").map((p, i) => <p key={i}>{p}</p>)}
+          </div>
         </section>
+
+        {tool.content.explained && (
+          <section>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">How {tool.shortTitle} Works</h2>
+            <div className="text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">
+              {tool.content.explained.split("\n\n").map((p, i) => <p key={i}>{p}</p>)}
+            </div>
+          </section>
+        )}
+
+        {tool.content.useCases && tool.content.useCases.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Common Use Cases</h2>
+            <ul className="space-y-3">
+              {tool.content.useCases.map((uc, i) => (
+                <li key={i} className="flex gap-2.5 text-slate-600 dark:text-slate-300">
+                  <span className="text-indigo-500 dark:text-indigo-400 shrink-0 mt-0.5">&#8226;</span>
+                  {uc}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {tool.content.howToUse.length > 0 && (
           <section>
@@ -83,6 +108,20 @@ export default function ToolPageClient({ slug }: { slug: string }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   {f}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {tool.content.tips && tool.content.tips.length > 0 && (
+          <section>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">Tips & Best Practices</h2>
+            <ul className="space-y-3">
+              {tool.content.tips.map((tip, i) => (
+                <li key={i} className="flex gap-2.5 text-slate-600 dark:text-slate-300">
+                  <span className="text-amber-500 shrink-0 mt-0.5">💡</span>
+                  {tip}
                 </li>
               ))}
             </ul>
