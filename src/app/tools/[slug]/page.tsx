@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getMetaBySlug, getAllSlugs } from "@/tools";
 import { SITE_NAME, SITE_URL } from "@/lib/constants";
+import { ToolJsonLd } from "@/components/seo/JsonLd";
 import ToolPageClient from "./client";
 
 export const dynamic = "force-static";
@@ -49,5 +50,10 @@ export default async function ToolPage({
   const tool = getMetaBySlug(slug);
   if (!tool) return notFound();
 
-  return <ToolPageClient slug={slug} />;
+  return (
+    <>
+      <ToolJsonLd tool={tool} />
+      <ToolPageClient slug={slug} />
+    </>
+  );
 }

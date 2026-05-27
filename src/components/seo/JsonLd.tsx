@@ -1,7 +1,7 @@
 import { SITE_URL } from "@/lib/constants";
-import { ToolDefinition } from "@/lib/types";
+import { type ToolMeta } from "@/tools";
 
-export function ToolJsonLd({ tool }: { tool: ToolDefinition }) {
+export function ToolJsonLd({ tool }: { tool: ToolMeta }) {
   const webApp = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
