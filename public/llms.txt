@@ -1,0 +1,26 @@
+# ManyAITool
+> Free online tools for developers, designers, and everyone.
+> All tools run 100% in the browser — no data is uploaded to any server.
+
+## Developer Tools
+- [JSON Formatter](https://manyaitool.com/tools/json-formatter): Format, minify, and validate JSON data instantly
+- [JWT Decoder](https://manyaitool.com/tools/jwt-decoder): Decode JWT tokens, inspect header/payload, check expiration
+- [Base64 Encoder](https://manyaitool.com/tools/base64-encoder): Encode and decode Base64 with Unicode support
+- [Timestamp Converter](https://manyaitool.com/tools/timestamp-converter): Convert Unix epoch timestamps to dates and back
+
+## Converters
+- [Markdown to HTML](https://manyaitool.com/tools/markdown-to-html): Convert Markdown to HTML with live preview
+- [SVG to PNG](https://manyaitool.com/tools/svg-to-png): Convert SVG to PNG with custom scale (1-4x) and background
+- [Image to Base64](https://manyaitool.com/tools/image-to-base64): Encode images to Base64, data URI, HTML img tag, CSS background
+
+## Calculators
+- [AI Token Calculator](https://manyaitool.com/tools/ai-token-calculator): Count tokens and estimate costs for 20+ AI models including GPT-4, Claude, Gemini
+
+## Text Tools
+- [Word Counter](https://manyaitool.com/tools/word-counter): Count words, characters, sentences, paragraphs, and estimate reading time
+
+## Design Tools
+- [Color Picker](https://manyaitool.com/tools/color-picker): Pick colors and convert between HEX, RGB, and HSL formats
+
+## Generators
+- [Lorem Ipsum Generator](https://manyaitool.com/tools/lorem-ipsum-generator): Generate placeholder text by paragraphs, sentences, or words

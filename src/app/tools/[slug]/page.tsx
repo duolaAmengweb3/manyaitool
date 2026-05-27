@@ -21,8 +21,11 @@ export async function generateMetadata({
   const tool = getMetaBySlug(slug);
   if (!tool) return {};
 
+  const fullTitle = `${tool.title} | ${SITE_NAME}`;
+  const title = fullTitle.length > 60 ? tool.title : fullTitle;
+
   return {
-    title: tool.title,
+    title: { absolute: title },
     description: tool.description,
     keywords: tool.keywords,
     alternates: { canonical: `${SITE_URL}/tools/${tool.slug}` },

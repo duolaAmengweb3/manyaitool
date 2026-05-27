@@ -1,14 +1,25 @@
-import { SITE_URL } from "@/lib/constants";
+import { SITE_URL, CATEGORY_LABELS } from "@/lib/constants";
 import { type ToolMeta } from "@/tools";
 
+const CATEGORY_SCHEMA: Record<string, string> = {
+  developer: "DeveloperApplication",
+  text: "UtilityApplication",
+  design: "DesignApplication",
+  converter: "UtilityApplication",
+  generator: "UtilityApplication",
+  calculator: "UtilityApplication",
+};
+
 export function ToolJsonLd({ tool }: { tool: ToolMeta }) {
+  const toolUrl = `${SITE_URL}/tools/${tool.slug}`;
+
   const webApp = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: tool.title,
-    url: `${SITE_URL}/tools/${tool.slug}`,
+    url: toolUrl,
     description: tool.description,
-    applicationCategory: "UtilityApplication",
+    applicationCategory: CATEGORY_SCHEMA[tool.category] || "UtilityApplication",
     operatingSystem: "Any",
     browserRequirements: "Requires JavaScript",
     offers: {
@@ -16,6 +27,30 @@ export function ToolJsonLd({ tool }: { tool: ToolMeta }) {
       price: "0",
       priceCurrency: "USD",
     },
+  };
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: CATEGORY_LABELS[tool.category] || tool.category,
+        item: `${SITE_URL}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: tool.shortTitle,
+      },
+    ],
   };
 
   const faqPage =
@@ -39,6 +74,10 @@ export function ToolJsonLd({ tool }: { tool: ToolMeta }) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(webApp) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
       {faqPage && (
         <script
