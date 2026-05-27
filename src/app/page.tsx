@@ -88,11 +88,16 @@ export default function HomePage() {
     <>
       <section className="bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-950 text-white">
         <div className="max-w-6xl mx-auto px-4 py-16 text-center">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-sm font-medium mb-6">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+            {allTools.length} tools &middot; 100% free &middot; No signup
+          </div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            Free Online Tools
+            Format, Convert, Calculate<br className="hidden sm:block" />
+            <span className="text-indigo-400">— All in Your Browser</span>
           </h1>
           <p className="text-lg text-slate-300 max-w-2xl mx-auto mb-8">
-            Fast, free, and private. All tools run entirely in your browser — no data is ever sent to a server.
+            JSON formatting, token counting, image converting, and more. Open a tool, paste your data, get results instantly. Nothing leaves your device.
           </p>
           <div className="max-w-xl mx-auto relative">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,27 +176,30 @@ export default function HomePage() {
       </section>
 
       <section className="border-y border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-        <div className="max-w-6xl mx-auto px-4 py-8 grid sm:grid-cols-3 gap-6 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+        <div className="max-w-6xl mx-auto px-4 py-10">
+          <h2 className="text-center text-lg font-semibold text-slate-800 dark:text-slate-200 mb-8">Why people choose ManyAITool</h2>
+          <div className="grid sm:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+              </div>
+              <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Your data stays with you</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">Every tool runs in your browser. We never see, store, or transmit your data. Paste sensitive code or API keys with confidence.</div>
             </div>
-            <div className="font-semibold text-slate-800 dark:text-slate-200 text-sm">100% Private</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">No data leaves your browser</div>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+              </div>
+              <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">Results in milliseconds</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">No loading spinners, no server roundtrips. Paste and get your result instantly. Works offline too — try turning off your WiFi.</div>
             </div>
-            <div className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Instant Results</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">All processing happens client-side</div>
-          </div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 flex items-center justify-center mx-auto mb-3">
+                <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+              </div>
+              <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">No ads, no signup, no nonsense</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">Just open and use. No account required, no cookie banners, no premium upsells blocking features. Every tool is completely free.</div>
             </div>
-            <div className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Always Free</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">No signup, no limits, no ads</div>
           </div>
         </div>
       </section>
