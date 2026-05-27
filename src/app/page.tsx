@@ -14,18 +14,32 @@ const CATEGORY_COLORS: Record<string, string> = {
   calculator: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
 };
 
-const TOOL_ICONS: Record<string, string> = {
-  "json-formatter": "{ }",
-  "word-counter": "Aa",
-  "base64-encoder": "B64",
-  "color-picker": "#",
-  "lorem-ipsum-generator": "Li",
-  "ai-token-calculator": "$T",
-  "jwt-decoder": "JWT",
-  "markdown-to-html": "MD",
-  "timestamp-converter": "TS",
-  "svg-to-png": "SVG",
-  "image-to-base64": "IMG",
+const TOOL_ICONS: Record<string, React.ReactNode> = {
+  "json-formatter": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>,
+  "word-counter": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+  "base64-encoder": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>,
+  "color-picker": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>,
+  "lorem-ipsum-generator": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h7" /></svg>,
+  "ai-token-calculator": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+  "jwt-decoder": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>,
+  "markdown-to-html": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg>,
+  "timestamp-converter": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
+  "svg-to-png": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>,
+  "image-to-base64": <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>,
+};
+
+const TOOL_TAGLINES: Record<string, string> = {
+  "json-formatter": "Beautify, minify, and validate JSON in one click",
+  "word-counter": "Words, characters, sentences, and reading time — live as you type",
+  "base64-encoder": "Encode and decode Base64 with full Unicode support",
+  "color-picker": "Pick any color, get HEX, RGB, and HSL instantly",
+  "lorem-ipsum-generator": "Placeholder text by paragraphs, sentences, or word count",
+  "ai-token-calculator": "Compare costs across GPT-4, Claude, Gemini, and 20+ models",
+  "jwt-decoder": "Decode tokens, check expiry, inspect claims in seconds",
+  "markdown-to-html": "Side-by-side Markdown editor with live HTML preview",
+  "timestamp-converter": "Unix epoch to human date and back, with live clock",
+  "svg-to-png": "Upload SVG, choose scale and background, download PNG",
+  "image-to-base64": "Get Base64, data URI, HTML tag, and CSS code from any image",
 };
 
 function ToolCard({ slug, isFav, onToggleFav }: { slug: string; isFav: boolean; onToggleFav: () => void }) {
@@ -44,17 +58,14 @@ function ToolCard({ slug, isFav, onToggleFav }: { slug: string; isFav: boolean; 
       </button>
       <Link href={`/tools/${tool.slug}`} className="block">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-700 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/40 flex items-center justify-center text-lg font-bold text-slate-500 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shrink-0">
-            {TOOL_ICONS[tool.slug] || "?"}
+          <div className="w-11 h-11 rounded-xl bg-indigo-50 dark:bg-indigo-900/30 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 transition-colors shrink-0">
+            {TOOL_ICONS[tool.slug] || <span className="text-lg font-bold">?</span>}
           </div>
           <div className="min-w-0 pr-6">
             <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-1">
               {tool.shortTitle}
             </h3>
-            <span className={`inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-2 ${CATEGORY_COLORS[tool.category] || "bg-slate-100 text-slate-600"}`}>
-              {tool.category}
-            </span>
-            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{tool.description}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2">{TOOL_TAGLINES[tool.slug] || tool.description}</p>
           </div>
         </div>
       </Link>
@@ -130,6 +141,21 @@ export default function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 py-12 space-y-10">
+        {recentTools.length === 0 && favTools.length === 0 && !search && activeCategory === "all" && (
+          <div>
+            <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2">
+              <svg className="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+              Popular — start here
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Not sure where to begin? These are the most-used tools.</p>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {["json-formatter", "ai-token-calculator", "word-counter"].map((slug) => (
+                <ToolCard key={slug} slug={slug} isFav={isFavorite(slug)} onToggleFav={() => toggleFavorite(slug)} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {recentTools.length > 0 && !search && activeCategory === "all" && (
           <div>
             <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
