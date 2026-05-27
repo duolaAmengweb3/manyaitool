@@ -115,6 +115,47 @@ export const toolMetas: ToolMeta[] = [
       relatedSlugs: ["word-counter"],
     },
   },
+  {
+    slug: "ai-token-calculator",
+    title: "AI Token Calculator - Count Tokens & Estimate LLM Costs Free",
+    shortTitle: "AI Token Calculator",
+    description: "Free AI token calculator. Count tokens and estimate costs for GPT-4, Claude, Gemini, and 20+ AI models. Compare pricing across providers instantly.",
+    category: "calculator",
+    keywords: ["ai token calculator", "llm cost calculator", "openai token counter", "chatgpt token calculator", "claude token counter", "gpt-4 pricing calculator", "ai api cost estimator"],
+    content: {
+      whatIs: "An AI Token Calculator helps you count the number of tokens in your text and estimate how much it will cost to process with different AI models. Tokens are the basic units that AI models like GPT-4, Claude, and Gemini use to measure text — roughly 4 characters or 0.75 words per token in English. Different models have different prices per token, and costs can vary dramatically: the same prompt might cost $0.001 with one model and $0.10 with another. This tool lets you paste your actual prompt, see the exact token count, compare costs across 20+ models from OpenAI, Anthropic, Google, and more, and project monthly expenses for your AI application. All calculations happen in your browser — your text is never sent to any server.",
+      howToUse: [
+        "Select an AI model from the dropdown, or leave the default to compare all models.",
+        "Paste your prompt or text into the input area, or switch to 'Token Count' mode and enter a number directly.",
+        "View the token count, cost breakdown, and context window usage.",
+        "Adjust the output token slider to estimate response costs.",
+        "Check the comparison table to find the cheapest model for your use case.",
+        "Use scenario templates to project daily, monthly, and yearly costs.",
+      ],
+      features: [
+        "Accurate token counting for OpenAI models using the official tokenizer",
+        "Cost estimation for 20+ AI models across 7 providers",
+        "Side-by-side model cost comparison sorted by total price",
+        "Prompt caching toggle showing real savings (up to 90% off)",
+        "Output token slider with preset quick-select buttons",
+        "Scenario templates: Chatbot, Content Generation, RAG, AI Agent",
+        "Daily, monthly, and yearly cost projections",
+        "Context window usage visualization",
+        "100% client-side — your prompts never leave your browser",
+      ],
+      faq: [
+        { question: "What is a token in AI?", answer: "A token is the basic unit of text that AI models process. In English, one token is roughly 4 characters or 0.75 words. The word 'hamburger' is split into 'ham', 'bur', and 'ger' — 3 tokens. Shorter common words like 'the' or 'is' are usually 1 token each." },
+        { question: "How many tokens is 1,000 words?", answer: "In English, 1,000 words is approximately 1,300-1,400 tokens. The exact count depends on the specific words used and the model's tokenizer. Technical text with code tends to use more tokens per word than plain prose." },
+        { question: "How much does it cost to use GPT-4o?", answer: "GPT-4o costs $2.50 per million input tokens and $10.00 per million output tokens. A typical conversation with 500 tokens in and 500 tokens out costs about $0.006 — roughly 160 conversations per dollar." },
+        { question: "What is the cheapest AI model?", answer: "As of May 2026, the cheapest major models are GPT-4.1 Nano ($0.10/$0.40 per million tokens), Gemini 2.0 Flash ($0.10/$0.40), and GPT-4o Mini ($0.15/$0.60). DeepSeek V3 is also very affordable at $0.27/$1.10." },
+        { question: "How does prompt caching reduce costs?", answer: "Prompt caching stores frequently used prompt prefixes (like system instructions) so you don't pay full price every time. With caching enabled, input costs can drop by 50-90%. For example, Claude Sonnet's cached input price is $0.30 vs $3.00 regular — a 90% saving." },
+        { question: "Why do Chinese and Japanese texts use more tokens?", answer: "CJK (Chinese, Japanese, Korean) characters typically use 1-2 tokens per character, while English uses about 1 token per 4 characters. This means processing the same meaning in Chinese costs roughly 2-3x more than in English." },
+        { question: "Are token counts exact for all models?", answer: "Token counts are exact for OpenAI models (using the official tokenizer). For Claude, Gemini, and other models, counts are estimated at approximately 4 characters per token, which is accurate within ±15%." },
+        { question: "What is the difference between input and output tokens?", answer: "Input tokens are what you send to the model (your prompt, instructions, context). Output tokens are what the model generates in response. Most providers charge more for output tokens than input tokens — typically 3-5x higher." },
+      ],
+      relatedSlugs: ["json-formatter", "word-counter", "base64-encoder"],
+    },
+  },
 ];
 
 export function getAllMetas(): ToolMeta[] {

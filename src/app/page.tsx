@@ -20,6 +20,7 @@ const TOOL_ICONS: Record<string, string> = {
   "base64-encoder": "B64",
   "color-picker": "#",
   "lorem-ipsum-generator": "Li",
+  "ai-token-calculator": "$T",
 };
 
 function ToolCard({ slug, isFav, onToggleFav }: { slug: string; isFav: boolean; onToggleFav: () => void }) {
