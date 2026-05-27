@@ -13,6 +13,14 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   metadataBase: new URL(SITE_URL),
+  icons: {
+    icon: "/favicon.svg",
+  },
+  openGraph: {
+    siteName: SITE_NAME,
+    type: "website",
+    images: [{ url: "/branding/logo-library/manyaitool-logo-yellow.png", width: 800, height: 400 }],
+  },
 };
 
 export default function RootLayout({

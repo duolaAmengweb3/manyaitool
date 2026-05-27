@@ -10,8 +10,8 @@ export function Header() {
   return (
     <header className="bg-slate-900 dark:bg-slate-950">
       <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-white hover:text-indigo-300 transition-colors">
-          {SITE_NAME}
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <img src="/branding/logo-library/manyaitool-logo-yellow.png" alt={SITE_NAME} className="h-9 sm:h-10" />
         </Link>
         <div className="flex items-center gap-4">
           <button

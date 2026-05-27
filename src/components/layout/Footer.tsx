@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <div className="grid sm:grid-cols-3 gap-8 mb-8">
           <div>
-            <h3 className="text-white font-semibold mb-3">{SITE_NAME}</h3>
+            <img src="/branding/logo-library/manyaitool-logo-yellow.png" alt={SITE_NAME} className="h-7 mb-3" />
             <p className="text-slate-400 text-sm leading-relaxed">
               Free online tools that run entirely in your browser. No data is ever uploaded to any server.
             </p>
