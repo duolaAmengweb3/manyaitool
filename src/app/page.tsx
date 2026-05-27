@@ -21,6 +21,11 @@ const TOOL_ICONS: Record<string, string> = {
   "color-picker": "#",
   "lorem-ipsum-generator": "Li",
   "ai-token-calculator": "$T",
+  "jwt-decoder": "JWT",
+  "markdown-to-html": "MD",
+  "timestamp-converter": "TS",
+  "svg-to-png": "SVG",
+  "image-to-base64": "IMG",
 };
 
 function ToolCard({ slug, isFav, onToggleFav }: { slug: string; isFav: boolean; onToggleFav: () => void }) {
