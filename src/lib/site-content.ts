@@ -8,10 +8,10 @@ export type TabKey = "all" | CategoryKey
 type Localized = Record<Lang, string>
 
 /** Display order of the category tabs. */
-export const CATEGORY_ORDER: CategoryKey[] = ["prediction", "perpdex", "agent", "web3", "stock", "dev", "text", "convert", "calendar"]
+export const CATEGORY_ORDER: CategoryKey[] = ["prediction", "perpdex", "agent", "web3", "security", "stock", "dev", "text", "convert", "calendar"]
 
 /** Fallback category order for the "all" view when items share the same launch date. */
-export const ALL_ORDER: CategoryKey[] = ["prediction", "perpdex", "agent", "web3", "stock", "dev", "text", "convert", "calendar"]
+export const ALL_ORDER: CategoryKey[] = ["prediction", "perpdex", "agent", "web3", "security", "stock", "dev", "text", "convert", "calendar"]
 
 export const TAB_ORDER: TabKey[] = ["all", ...CATEGORY_ORDER]
 
@@ -20,6 +20,7 @@ export const CATEGORY_META: Record<CategoryKey, { label: Localized; accent: stri
   perpdex: { label: { en: "Perp DEX", "zh-Hans": "永续合约", "zh-Hant": "永續合約" }, accent: "#5EEAD4" },
   agent: { label: { en: "AI Agent", "zh-Hans": "AI 代理", "zh-Hant": "AI 代理" }, accent: "#F472B6" },
   web3: { label: { en: "Web3", "zh-Hans": "Web3", "zh-Hant": "Web3" }, accent: "#FDBA74" },
+  security: { label: { en: "Security", "zh-Hans": "安全", "zh-Hant": "安全" }, accent: "#EF4444" },
   stock: { label: { en: "US Stocks", "zh-Hans": "美股", "zh-Hant": "美股" }, accent: "#FF6B6B" },
   dev: { label: { en: "Dev", "zh-Hans": "开发", "zh-Hant": "開發" }, accent: "#2F81F7" },
   text: { label: { en: "Text", "zh-Hans": "文本", "zh-Hant": "文字" }, accent: "#A78BFA" },

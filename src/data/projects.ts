@@ -14,6 +14,7 @@ export type ProjectsMap = {
   perpdex: ProjectItem[]
   agent: ProjectItem[]
   web3: ProjectItem[]
+  security: ProjectItem[]
   stock: ProjectItem[]
   dev: ProjectItem[]
   text: ProjectItem[]
@@ -328,6 +329,373 @@ export const projects: ProjectsMap = {
         en: "A daily reading so you never choose wrong — on-chain mysticism, 'scientific' fortune-telling.",
         "zh-Hans": "每天测一测,选择不会错。链上玄学,科学算命。",
         "zh-Hant": "每天測一測,選擇不會錯。鏈上玄學,科學算命。",
+      },
+    },
+  ],
+  security: [
+    {
+      id: "duolasafe",
+      url: "https://duolasafe.manyaitool.com",
+      isNew: true,
+      title: {
+        en: "DuoLaSafe — Web3 Security Studio",
+        "zh-Hans": "DuoLaSafe — Web3 安全工作室",
+        "zh-Hant": "DuoLaSafe — Web3 安全工作室",
+      },
+      description: {
+        en: "Smart-contract audits, on-chain forensics and asset-recovery support — every report public, PoC-backed, with an adversarial ruled-out section.",
+        "zh-Hans": "智能合约审计、链上取证、被盗资产追回协助 —— 每份报告公开、带可运行 PoC、含对抗性排除章节,不做盖章式审计。",
+        "zh-Hant": "智能合約審計、鏈上取證、被盜資產追回協助 —— 每份報告公開、帶可運行 PoC、含對抗性排除章節,不做蓋章式審計。",
+      },
+    },
+    {
+      id: "polymarket",
+      url: "https://polymarket.manyaitool.com",
+      title: {
+        en: "Polymarket $2.9M fund-tracking investigation",
+        "zh-Hans": "Polymarket $2.9M 资金追踪与取证",
+        "zh-Hant": "Polymarket $2.9M 資金追蹤與取證",
+      },
+      description: {
+        en: "A frontend supply-chain attack drained ~$2.9M from 11 users. The press said the funds still sit in the consolidation wallet — we traced the chain: already moved, split and idle across 3 wallets, plus the address-poisoning targeting the loot. A verifiable, dated on-chain snapshot.",
+        "zh-Hans": "前端供应链攻击盗走 11 个用户约 $2.9M。媒体说钱还在归集钱包——我们上链取证:钱早转走,分散静置在 3 个钱包,还揪出针对赃款的地址投毒。做成可复核的链上快照页。",
+        "zh-Hant": "前端供應鏈攻擊盜走 11 個用戶約 $2.9M。媒體說錢還在歸集錢包——我們上鍊取證:錢早轉走,分散靜置在 3 個錢包,還揪出針對贓款的地址投毒。做成可複核的鏈上快照頁。",
+      },
+    },
+    {
+      id: "verus-bridge",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Verus%E6%A1%A5-%E6%8A%80%E6%9C%AF%E5%A4%8D%E7%9B%98.md",
+      title: {
+        en: "Verus bridge $11.58M post-mortem",
+        "zh-Hans": "Verus 跨链桥 $11.58M 技术复盘",
+        "zh-Hant": "Verus 跨鏈橋 $11.58M 技術覆盤",
+      },
+      description: {
+        en: "The bridge's submitImports never enforced cross-chain amount conservation; $11.58M drained, swapped to 5,402 ETH. A full 7-section root-cause + attack-tx breakdown with fund tracing: reported as \"funds unmoved,\" yet on-chain the loot split out (4,052+1,350 ETH) just 3 days later and the wallet was empty by Jun 27.",
+        "zh-Hans": "桥的 submitImports 没校验跨端金额守恒,被盗 $11.58M、换成 5,402 ETH。按 7 段取证模板复盘根因 + 攻击 tx,并追踪资金:PeckShield 称“资金未动”,我们实证案发仅 3 天后赃款已分两笔(4052+1350 ETH)转走,6/27 钱包已清空。",
+        "zh-Hant": "橋的 submitImports 沒校驗跨端金額守恆,被盜 $11.58M、換成 5,402 ETH。按 7 段取證模板覆盤根因 + 攻擊 tx,並追蹤資金:PeckShield 稱“資金未動”,我們實證案發僅 3 天后贓款已分兩筆(4052+1350 ETH)轉走,6/27 錢包已清空。",
+      },
+    },
+    {
+      id: "humanity-protocol",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Humanity-36M%E4%BA%8B%E4%BB%B6%E5%88%86%E6%9E%90.md",
+      title: {
+        en: "Humanity Protocol $36M analysis",
+        "zh-Hans": "Humanity Protocol $36M 事件分析",
+        "zh-Hant": "Humanity Protocol $36M 事件分析",
+      },
+      description: {
+        en: "Not a contract bug — a fake multisig: the 7 keys controlling the token and bridge were all backed up on one developer's laptop, and a single Bithumb-spoofing phishing email took the lot, moving ~447M $H across ETH/BSC. A 7-section root-cause + attack-flow breakdown; Quantstamp attributes it to DPRK.",
+        "zh-Hans": "合约一行没坏——假多签:控制代币与桥的 7 把私钥全备份在一台开发者笔记本上,一封冒充 Bithumb 的钓鱼邮件就拿下全部权限,跨 ETH/BSC 动用约 447M $H。按 7 段模板拆根因 + 攻击流程,Quantstamp 归因朝鲜。",
+        "zh-Hant": "合約一行沒壞——假多籤:控制代幣與橋的 7 把私鑰全備份在一臺開發者筆記本上,一封冒充 Bithumb 的釣魚郵件就拿下全部權限,跨 ETH/BSC 動用約 447M $H。按 7 段模板拆根因 + 攻擊流程,Quantstamp 歸因朝鮮。",
+      },
+    },
+    {
+      id: "bybit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Bybit-15%E4%BA%BF-SafeUI%E6%94%BB%E5%87%BB.md",
+      title: {
+        en: "Bybit $1.5B — the largest hack ever",
+        "zh-Hans": "Bybit $1.5B 史上最大盗窃复盘",
+        "zh-Hant": "Bybit $1.5B 史上最大盜竊覆盤",
+      },
+      description: {
+        en: "Lazarus tampered Safe{Wallet}'s frontend JS, swapping a cold-wallet transfer for a DELEGATECALL that replaced the implementation and drained the vault. We verified on-chain that the Safe's slot0 still points to the malicious contract. A 7-section breakdown.",
+        "zh-Hans": "Lazarus 篡改 Safe{Wallet} 前端 JS,把一笔冷钱包转账偷换成 DELEGATECALL、替换实现合约后清空金库。我方 cast 复核:该 Safe 的 slot0 至今仍指向恶意合约。7 段技术复盘。",
+        "zh-Hant": "Lazarus 篡改 Safe{Wallet} 前端 JS,把一筆冷錢包轉賬偷換成 DELEGATECALL、替換實現合約後清空金庫。我方 cast 複核:該 Safe 的 slot0 至今仍指向惡意合約。7 段技術覆盤。",
+      },
+    },
+    {
+      id: "kelpdao",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/KelpDAO-292M-%E8%B7%A8%E9%93%BE%E6%A1%A5.md",
+      title: {
+        en: "KelpDAO $292M bridge hack",
+        "zh-Hans": "KelpDAO $292M 跨链桥复盘",
+        "zh-Hant": "KelpDAO $292M 跨鏈橋覆盤",
+      },
+      description: {
+        en: "A 1-of-1 LayerZero DVN was poisoned via compromised RPC nodes + DDoS failover, forging a phantom source-chain burn to mint 116,500 unbacked rsETH. We verified the mint tx, GUID, Tornado funding and Arbitrum freeze. Attributed to Lazarus.",
+        "zh-Hans": "LayerZero 单 DVN 被 RPC 污染 + DDoS 故障切换攻陷,伪造源链销毁消息凭空铸造 116,500 rsETH。我方核实了铸币 tx、GUID、Tornado 资助与 Arbitrum 冻结。归因朝鲜 Lazarus。",
+        "zh-Hant": "LayerZero 單 DVN 被 RPC 汙染 + DDoS 故障切換攻陷,偽造源鏈銷燬消息憑空鑄造 116,500 rsETH。我方核實了鑄幣 tx、GUID、Tornado 資助與 Arbitrum 凍結。歸因朝鮮 Lazarus。",
+      },
+    },
+    {
+      id: "drift",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Drift-285M-%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6.md",
+      title: {
+        en: "Drift $285M access-control takeover",
+        "zh-Hans": "Drift $285M 访问控制失守",
+        "zh-Hant": "Drift $285M 訪問控制失守",
+      },
+      description: {
+        en: "Not a contract bug: attackers spent 6 months social-engineering into the Security Council via a fake trading firm, weaponizing Solana durable nonces to pre-sign admin transfers and drain vaults with fake collateral. Attributed to DPRK.",
+        "zh-Hans": "非合约漏洞:攻击者用假交易公司身份花 6 个月渗透 Security Council,利用 Solana durable nonce 预签名诱导盲签,夺管理员权、假抵押抽干金库。归因 DPRK。",
+        "zh-Hant": "非合約漏洞:攻擊者用假交易公司身份花 6 個月滲透 Security Council,利用 Solana durable nonce 預簽名誘導盲籤,奪管理員權、假抵押抽乾金庫。歸因 DPRK。",
+      },
+    },
+    {
+      id: "resolv",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Resolv-25M-KMS%E5%AF%86%E9%92%A5.md",
+      title: {
+        en: "Resolv $25M KMS key compromise",
+        "zh-Hans": "Resolv $25M KMS 密钥失守",
+        "zh-Hant": "Resolv $25M KMS 密鑰失守",
+      },
+      description: {
+        en: "Resolv's AWS KMS signing key was compromised, minting 80M unbacked USR from ~$100K USDC via two completeSwap calls and cashing out ~11K ETH. Root cause: a single off-chain key plus no on-chain mint cap. On-chain verified.",
+        "zh-Hans": "AWS KMS 云端特权签名密钥被攻破,用约 $10 万 USDC 触发两笔 completeSwap 凭空增发 8000 万无抵押 USR、套现约 1.1 万 ETH。根因:链下单点密钥 + 合约无铸币上限。链上已核。",
+        "zh-Hant": "AWS KMS 雲端特權簽名密鑰被攻破,用約 $10 萬 USDC 觸發兩筆 completeSwap 憑空增發 8000 萬無抵押 USR、套現約 1.1 萬 ETH。根因:鏈下單點密鑰 + 合約無鑄幣上限。鏈上已核。",
+      },
+    },
+    {
+      id: "truebit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Truebit-26M-%E6%95%B4%E6%95%B0%E6%BA%A2%E5%87%BA.md",
+      title: {
+        en: "Truebit $26.2M integer overflow",
+        "zh-Hans": "Truebit $26.2M 整数溢出",
+        "zh-Hant": "Truebit $26.2M 整數溢出",
+      },
+      description: {
+        en: "A legacy purchase contract (Solidity 0.6.10, no overflow checks) overflowed its pricing math; a huge input wrapped the price to ~0, letting the attacker mint TRU for free and drain 8,535 ETH in one tx. Attack tx and overflow math both verified on-chain.",
+        "zh-Hans": "旧购买合约(Solidity 0.6.10 无溢出检查)定价分子整数溢出,超大输入使价格回绕到约 0,零成本铸 TRU 卖回储备,单笔套走 8,535 ETH。攻击 tx 与溢出数学均已链上核。",
+        "zh-Hant": "舊購買合約(Solidity 0.6.10 無溢出檢查)定價分子整數溢出,超大輸入使價格迴繞到約 0,零成本鑄 TRU 賣回儲備,單筆套走 8,535 ETH。攻擊 tx 與溢出數學均已鏈上核。",
+      },
+    },
+    {
+      id: "moonwell-oracle-misconfiguration",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Moonwell-%E9%A2%84%E8%A8%80%E6%9C%BA%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF.md",
+      title: {
+        en: "Moonwell oracle misconfiguration",
+        "zh-Hans": "Moonwell 预言机配置错误",
+        "zh-Hant": "Moonwell 預言機配置錯誤",
+      },
+      description: {
+        en: "An oracle update dropped the ETH/USD leg of cbETH pricing, mispricing cbETH at ~$1.12 vs ~$2,200; liquidators seized 1,096 cbETH for ~$1 each, leaving ~$1.78M bad debt. One missing price leg = real money.",
+        "zh-Hans": "MIP-X43 上线时 cbETH 喂价漏配 ETH/USD 段,价从约 $2,200 错算为约 $1.12,清算者以约 $1 夺走 1,096 cbETH,留下约 $178 万坏账。一个漏掉的价格组合 = 真金白银。",
+        "zh-Hant": "MIP-X43 上線時 cbETH 喂價漏配 ETH/USD 段,價從約 $2,200 錯算為約 $1.12,清算者以約 $1 奪走 1,096 cbETH,留下約 $178 萬壞賬。一個漏掉的價格組合 = 真金白銀。",
+      },
+    },
+    {
+      id: "cetus",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Cetus-220M-AMM%E6%BA%A2%E5%87%BA.md",
+      title: {
+        en: "Cetus $220M AMM overflow",
+        "zh-Hans": "Cetus $220M AMM 溢出复盘",
+        "zh-Hant": "Cetus $220M AMM 溢出覆盤",
+      },
+      description: {
+        en: "Sui's largest AMM: a wrong overflow mask in checked_shlw (0xffff…<<192 vs 1<<192) let a u256 left-shift silently truncate, minting ~1.03e34 liquidity for ~1 token to drain reserves. ~$220M lost; ~$162M frozen by validators and returned via governance.",
+        "zh-Hans": "Sui 最大 AMM:checked_shlw 溢出校验掩码写错(0xffff…<<192 而非 1<<192),u256 左移被静默截断,1 个 token 撬动 1.03×10³⁴ 流动性抽干储备。$220M 损失,~$162M 被验证者冻结后经治理返还。",
+        "zh-Hant": "Sui 最大 AMM:checked_shlw 溢出校驗掩碼寫錯(0xffff…<<192 而非 1<<192),u256 左移被靜默截斷,1 個 token 撬動 1.03×10³⁴ 流動性抽乾儲備。$220M 損失,~$162M 被驗證者凍結後經治理返還。",
+      },
+    },
+    {
+      id: "gmx-v1",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/GMX-V1-42M-%E9%87%8D%E5%85%A5.md",
+      title: {
+        en: "GMX V1 $42M reentrancy",
+        "zh-Hans": "GMX V1 $42M 重入复盘",
+        "zh-Hant": "GMX V1 $42M 重入覆盤",
+      },
+      description: {
+        en: "Arbitrum perp DEX: a reentrancy via the executeDecreaseOrder callback skipped the globalShortAveragePrices update, crushing BTC short avg price and inflating GLP for profitable redemptions. Attack tx verified on-chain; all funds returned, $5M white-hat bounty.",
+        "zh-Hans": "Arbitrum 头部永续:executeDecreaseOrder 回调重入开空、跳过空头均价更新,砸低 BTC 空头均价、虚高 GLP 后赎回套利。攻击 tx 链上核实;事后全额归还、留 $5M 白帽赏金。",
+        "zh-Hant": "Arbitrum 頭部永續:executeDecreaseOrder 回調重入開空、跳過空頭均價更新,砸低 BTC 空頭均價、虛高 GLP 後贖回套利。攻擊 tx 鏈上核實;事後全額歸還、留 $5M 白帽賞金。",
+      },
+    },
+    {
+      id: "rhea-finance",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Rhea-18.4M-%E6%BB%91%E7%82%B9%E6%A0%A1%E9%AA%8C%E7%BC%BA%E9%99%B7.md",
+      title: {
+        en: "Rhea Finance $18.4M slippage-check flaw",
+        "zh-Hans": "Rhea Finance $18.4M 滑点校验缺陷",
+        "zh-Hant": "Rhea Finance $18.4M 滑點校驗缺陷",
+      },
+      description: {
+        en: "NEAR's top DeFi. Early labeled oracle manipulation, the real cause was a Burrowland margin slippage-check that summed per-hop min-outputs across a crafted route while settling actuals with no re-check. Loss revised $7.6M→$18.4M; ~$11.2M returned/frozen.",
+        "zh-Hans": "NEAR 最大 DeFi。早期被判「预言机操纵」,真根因是 Burrowland 杠杆滑点校验把多跳路由各段最小产出累加、结算却不回校;损失由 $7.6M 修订至 $18.4M,~$11.2M 已返还/冻结。",
+        "zh-Hant": "NEAR 最大 DeFi。早期被判「預言機操縱」,真根因是 Burrowland 槓桿滑點校驗把多跳路由各段最小產出累加、結算卻不回校;損失由 $7.6M 修訂至 $18.4M,~$11.2M 已返還/凍結。",
+      },
+    },
+    {
+      id: "aperture-finance",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Aperture-3.67M-approval.md",
+      title: {
+        en: "Aperture Finance $3.67M arbitrary call",
+        "zh-Hans": "Aperture Finance $3.67M 任意调用",
+        "zh-Hant": "Aperture Finance $3.67M 任意調用",
+      },
+      description: {
+        en: "An arbitrary-call flaw in the V3/V4 executor: the custom-swap function (selector 0x1d33) left call target/calldata unvalidated, letting the attacker craft transferFrom via the victim's pre-existing approvals and drain 36.9 WBTC. Main tx verified; ~$2.4M to Tornado.",
+        "zh-Hans": "V3/V4 执行合约的自定义 swap 函数(选择器 0x1d33)不校验 call target/calldata,攻击者借受害者历史授权构造 transferFrom 抽走 36.9 WBTC。主战 tx 链上核实,~$2.4M 进 Tornado。",
+        "zh-Hant": "V3/V4 執行合約的自定義 swap 函數(選擇器 0x1d33)不校驗 call target/calldata,攻擊者借受害者歷史授權構造 transferFrom 抽走 36.9 WBTC。主戰 tx 鏈上核實,~$2.4M 進 Tornado。",
+      },
+    },
+    {
+      id: "foom-cash",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/FoomCash-2.3M-zk%E9%AA%8C%E8%AF%81.md",
+      title: {
+        en: "Foom Cash $2.3M zk-verifier flaw",
+        "zh-Hans": "Foom Cash $2.3M zk 验证缺陷",
+        "zh-Hant": "Foom Cash $2.3M zk 驗證缺陷",
+      },
+      description: {
+        en: "zk-SNARK privacy protocol: a skipped Phase-2 trusted-setup randomization left Groth16 gamma==delta, collapsing the pairing check to 1=1 so forged proofs passed without a witness. ~$2.26M drained across ETH+Base; ~$1.84M recovered by white hats.",
+        "zh-Hans": "zk-SNARK 隐私协议:Groth16 可信设置 Phase 2 漏跑随机化,γ=δ 致配对校验退化成恒等式(1=1),假证明无 witness 即过。ETH+Base 两链被放空 ~$2.26M,白帽追回 ~$1.84M。",
+        "zh-Hant": "zk-SNARK 隱私協議:Groth16 可信設置 Phase 2 漏跑隨機化,γ=δ 致配對校驗退化成恆等式(1=1),假證明無 witness 即過。ETH+Base 兩鏈被放空 ~$2.26M,白帽追回 ~$1.84M。",
+      },
+    },
+    {
+      id: "venus-user",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Venus-13.5M-%E9%92%93%E9%B1%BC%E7%9B%B2%E7%AD%BE.md",
+      title: {
+        en: "Venus user $13.5M phishing blind-sign",
+        "zh-Hans": "Venus 大户 $13.5M 钓鱼盲签",
+        "zh-Hant": "Venus 大戶 $13.5M 釣魚盲籤",
+      },
+      description: {
+        en: "A power user was phished via a fake Zoom client and a tampered wallet extension, blind-signing an updateDelegate that handed account-delegate rights to the attacker — ~$13.5M drained. The contract held; the signature didn't. Governance force-liquidated; funds fully recovered in 12h.",
+        "zh-Hans": "假 Zoom + 钱包扩展被篡改,大户在硬件钱包上盲签一笔 updateDelegate、把仓位代理权交给攻击者,~$13.5M 被抽。合约没坏,坏在签名。Venus 治理强制清算,12 小时全额追回。",
+        "zh-Hant": "假 Zoom + 錢包擴展被篡改,大戶在硬件錢包上盲籤一筆 updateDelegate、把倉位代理權交給攻擊者,~$13.5M 被抽。合約沒壞,壞在簽名。Venus 治理強制清算,12 小時全額追回。",
+      },
+    },
+    {
+      id: "aztec-deprecated-bridge",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Aztec-RollupProcessor-2.16M.md",
+      title: {
+        en: "Aztec deprecated bridge $2.16M forged proof",
+        "zh-Hans": "Aztec 废弃桥 $2.16M 伪造证明",
+        "zh-Hant": "Aztec 廢棄橋 $2.16M 偽造證明",
+      },
+      description: {
+        en: "A deprecated, immutable, abandoned RollupProcessor bridge: its escapeHatch had no access control and proofs weren't bound to fund ownership, so a forged proof drained ~1,158 ETH + 150k DAI in one tx. Tx and the now-empty victim contract verified on-chain.",
+        "zh-Hans": "2022 下线、不可升级、弃管的 RollupProcessor:escapeHatch 紧急取款无访问控制 + 证明不绑定资金归属,攻击者凭伪造证明单笔提走 ~1,158 ETH+15万 DAI。tx 与受害合约已清空均链上核实。",
+        "zh-Hant": "2022 下線、不可升級、棄管的 RollupProcessor:escapeHatch 緊急取款無訪問控制 + 證明不綁定資金歸屬,攻擊者憑偽造證明單筆提走 ~1,158 ETH+15萬 DAI。tx 與受害合約已清空均鏈上核實。",
+      },
+    },
+    {
+      id: "base-fake-stablecoin-scan-70-fake-pyusd",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E9%93%BE%E4%B8%8A%E8%B0%83%E6%9F%A5/Base-%E5%81%87%E7%A8%B3%E5%AE%9A%E5%B8%81%E6%89%AB%E6%8F%8F-%E7%A0%94%E7%A9%B6.md",
+      title: {
+        en: "Base fake-stablecoin scan: 70 fake PYUSD",
+        "zh-Hans": "Base 假稳定币扫描:70 个山寨 PYUSD",
+        "zh-Hant": "Base 假穩定幣掃描:70 個山寨 PYUSD",
+      },
+      description: {
+        en: "Our in-house scanner flagged 70 fake stablecoins on Base impersonating PYUSD/FDUSD in a single pass: most with fake decimals (18 vs real PYUSD's 6) and very few holders — phishing-scam bait. All catalogued for lookup. Original first-party data.",
+        "zh-Hans": "我们自建扫描器单次在 Base 揪出 70 个冒充 PYUSD/FDUSD 的山寨稳定币:绝大多数小数位造假(decimals=18,真 PYUSD=6)、持有人极少,是钓鱼诈骗诱饵。已全部入情报库可查。独家数据。",
+        "zh-Hant": "我們自建掃描器單次在 Base 揪出 70 個冒充 PYUSD/FDUSD 的山寨穩定幣:絕大多數小數位造假(decimals=18,真 PYUSD=6)、持有人極少,是釣魚詐騙誘餌。已全部入情報庫可查。獨家數據。",
+      },
+    },
+    {
+      id: "twyne-v1-leveraged-lending-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/2026/Twyne-Contracts-v1-%E5%AE%A1%E8%AE%A1%E6%8A%A5%E5%91%8A.md",
+      title: {
+        en: "Twyne v1 leveraged-lending audit",
+        "zh-Hans": "Twyne v1 杠杆借贷审计",
+        "zh-Hant": "Twyne v1 槓桿借貸審計",
+      },
+      description: {
+        en: "Full audit of a leveraged-lending protocol on Euler EVC/EVK: manual review of 11 contracts + Slither + Foundry fuzz, adversarially verifying and refuting 6 potential attack surfaces. Report includes a \"ruled-out attacks\" section.",
+        "zh-Hans": "对建在 Euler EVC/EVK 上的杠杆借贷协议做完整审计:人工审 11 合约 + Slither + Foundry fuzz,对抗性验证并证伪了 6 个潜在攻击面。报告含“排除攻击”章节。",
+        "zh-Hant": "對建在 Euler EVC/EVK 上的槓桿借貸協議做完整審計:人工審 11 合約 + Slither + Foundry fuzz,對抗性驗證並證偽了 6 個潛在攻擊面。報告含“排除攻擊”章節。",
+      },
+    },
+    {
+      id: "silo-v3-isolated-lending-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/2026/Silo-V3-%E5%AE%A1%E8%AE%A1%E6%8A%A5%E5%91%8A.md",
+      title: {
+        en: "Silo V3 isolated-lending audit",
+        "zh-Hans": "Silo V3 隔离借贷审计",
+        "zh-Hant": "Silo V3 隔離借貸審計",
+      },
+      description: {
+        en: "Manual + adversarial verification of the core silo-core: 0 highs, 7 candidate attack surfaces ruled out one by one, report public and verifiable.",
+        "zh-Hans": "对核心 silo-core 做人工 + 对抗性验证:0 高危,逐一排除 7 个候选攻击面,报告公开可核对。",
+        "zh-Hant": "對核心 silo-core 做人工 + 對抗性驗證:0 高危,逐一排除 7 個候選攻擊面,報告公開可核對。",
+      },
+    },
+    {
+      id: "thunderloan-flash-loan-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E5%AE%A1%E8%AE%A1-FirstFlight/ThunderLoan-%E5%AE%A1%E8%AE%A1.md",
+      title: {
+        en: "ThunderLoan flash-loan audit (First Flight)",
+        "zh-Hans": "ThunderLoan 闪电贷审计(First Flight)",
+        "zh-Hant": "ThunderLoan 閃電貸審計(First Flight)",
+      },
+      description: {
+        en: "Audited the CodeHawks ThunderLoan flash-loan protocol; 3 Highs all PoC-proven: deposit() corrupts the exchange rate (redeem more than deposited, draining LPs), an upgrade storage-slot collision silently rewrites the fee, and a manipulable spot oracle enables zero-fee flash loans.",
+        "zh-Hans": "审计 CodeHawks 闪电贷协议,3 个 High 全 PoC 坐实:存款污染兑换率可多赎本金抽干 LP、升级存储槽冲突悄改费率、现货预言机可操纵致免费闪电贷。已排除若干误报。",
+        "zh-Hant": "審計 CodeHawks 閃電貸協議,3 個 High 全 PoC 坐實:存款汙染兌換率可多贖本金抽乾 LP、升級存儲槽衝突悄改費率、現貨預言機可操縱致免費閃電貸。已排除若干誤報。",
+      },
+    },
+    {
+      id: "brivault-betting-vault-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E5%AE%A1%E8%AE%A1-FirstFlight/BriVault-%E5%AE%A1%E8%AE%A1.md",
+      title: {
+        en: "BriVault betting-vault audit (First Flight)",
+        "zh-Hans": "BriVault 押注金库审计(First Flight)",
+        "zh-Hant": "BriVault 押注金庫審計(First Flight)",
+      },
+      description: {
+        en: "Audited the CodeHawks BriVault ERC4626 betting vault; 2 Criticals + 1 Medium all PoC-proven: a post-join re-deposit drains the entire prize pool (honest winner gets 0), overwriting accounting permanently locks a user's first deposit, and balanceOf-based pricing dilutes shares.",
+        "zh-Hans": "审计 CodeHawks ERC4626 押注金库,2 Critical+1 Medium 全 PoC 坐实:报名后二次存款掏空整个奖池让诚实赢家归零、覆盖式记账永久锁死首笔本金、balanceOf 计价可稀释份额。",
+        "zh-Hant": "審計 CodeHawks ERC4626 押注金庫,2 Critical+1 Medium 全 PoC 坐實:報名後二次存款掏空整個獎池讓誠實贏家歸零、覆蓋式記賬永久鎖死首筆本金、balanceOf 計價可稀釋份額。",
+      },
+    },
+    {
+      id: "multisig-timelock-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E5%AE%A1%E8%AE%A1-FirstFlight/MultisigTimelock-%E5%AE%A1%E8%AE%A1.md",
+      title: {
+        en: "Multisig + timelock audit (First Flight)",
+        "zh-Hans": "多签+时间锁审计(First Flight)",
+        "zh-Hant": "多籤+時間鎖審計(First Flight)",
+      },
+      description: {
+        en: "Audited a CodeHawks 3-of-N multisig wallet; 1 High proven by PoC: revoking a signer never clears their confirmations on pending txs — these ghost votes stay in the quorum, so a single remaining signer can execute a 3-of-N transaction and drain the wallet.",
+        "zh-Hans": "审计 CodeHawks 3-of-N 多签钱包,1 个 High 用 PoC 坐实:移除签名者时未清掉它在待处理交易上的投票,幽灵确认永久计入法定数 → 单签名者即可执行 3-of-N 交易抽走资金。",
+        "zh-Hant": "審計 CodeHawks 3-of-N 多籤錢包,1 個 High 用 PoC 坐實:移除簽名者時未清掉它在待處理交易上的投票,幽靈確認永久計入法定數 → 單簽名者即可執行 3-of-N 交易抽走資金。",
+      },
+    },
+    {
+      id: "order-book-dex-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E5%AE%A1%E8%AE%A1-FirstFlight/OrderBook-%E5%AE%A1%E8%AE%A1.md",
+      title: {
+        en: "Order-book DEX audit (First Flight)",
+        "zh-Hans": "订单簿 DEX 审计(First Flight)",
+        "zh-Hant": "訂單簿 DEX 審計(First Flight)",
+      },
+      description: {
+        en: "Audited a CodeHawks order-book DEX; 1 High proven by PoC: buyOrder has no slippage bound, so a seller front-runs amendSellOrder to inflate price/shrink amount and drain the buyer's infinite USDC approval (900k USDC for 1 satoshi). Plus 1 Low; 2 issues adversarially excluded.",
+        "zh-Hans": "审计 CodeHawks 订单簿 DEX,1 个 High 用 PoC 坐实:buyOrder 无滑点保护,卖家抢跑 amendSellOrder 改价改量,把买家无限授权的 USDC 抽干(90 万 USDC 只换 1 satoshi)。另含 1 Low,排除 2 误报。",
+        "zh-Hant": "審計 CodeHawks 訂單簿 DEX,1 個 High 用 PoC 坐實:buyOrder 無滑點保護,賣家搶跑 amendSellOrder 改價改量,把買家無限授權的 USDC 抽乾(90 萬 USDC 只換 1 satoshi)。另含 1 Low,排除 2 誤報。",
+      },
+    },
+    {
+      id: "puppyraffle-audit",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits/blob/main/%E5%AE%A1%E8%AE%A1-FirstFlight/PuppyRaffle-%E5%AE%A1%E8%AE%A1.md",
+      title: {
+        en: "PuppyRaffle audit (First Flight)",
+        "zh-Hans": "PuppyRaffle 抽奖审计(First Flight)",
+        "zh-Hant": "PuppyRaffle 抽獎審計(First Flight)",
+      },
+      description: {
+        en: "Audited the classic CodeHawks PuppyRaffle; 2 Criticals + 3 Highs all PoC-proven: refund() reentrancy drains the contract (1 ETH in, 5 ETH out), predictable RNG, a uint64 fee overflow locking 20 ETH, a force-send DoS, and an O(n²) gas DoS on entry.",
+        "zh-Hans": "审计 CodeHawks 经典抽奖合约,2 Critical+3 High 全 PoC 坐实:refund 重入抽空合约(1 ETH 撬 5 ETH)、弱随机数可预测中奖、uint64 费用溢出锁死 20 ETH、强制转账 DoS、O(n²) Gas 爆炸。",
+        "zh-Hant": "審計 CodeHawks 經典抽獎合約,2 Critical+3 High 全 PoC 坐實:refund 重入抽空合約(1 ETH 撬 5 ETH)、弱隨機數可預測中獎、uint64 費用溢出鎖死 20 ETH、強制轉賬 DoS、O(n²) Gas 爆炸。",
+      },
+    },
+    {
+      id: "jucoin",
+      url: "https://github.com/duolaAmengweb3/DuoLaSafe-Audits",
+      title: {
+        en: "JuCoin $511M reserve debunk",
+        "zh-Hans": "JuCoin $511M 储备打假",
+        "zh-Hant": "JuCoin $511M 儲備打假",
+      },
+      description: {
+        en: "On-chain data exposed their PoR: the \"USDC reserve\" was a self-deployed, mintable shitcoin with only 14 holders chain-wide. Done in minutes, at zero cost.",
+        "zh-Hans": "用链上数据戳穿其 PoR:所谓“USDC 储备”是项目方自部署、可任意增发、全链仅 14 持有人的山寨币。几分钟、零成本完成。",
+        "zh-Hant": "用鏈上數據戳穿其 PoR:所謂“USDC 儲備”是項目方自部署、可任意增發、全鏈僅 14 持有人的山寨幣。幾分鐘、零成本完成。",
       },
     },
   ],
