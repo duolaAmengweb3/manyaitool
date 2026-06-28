@@ -30,7 +30,9 @@ export function SiteHome({ lang }: { lang: Lang }) {
   const entries: ProductEntry[] =
     category === "all"
       ? ALL_ORDER.flatMap((k) => projects[k].map((item) => ({ item, category: k as CategoryKey }))).sort(
-          (a, b) => launchTime(b.item.launchedAt) - launchTime(a.item.launchedAt),
+          (a, b) =>
+            Number(b.item.pinned ?? false) - Number(a.item.pinned ?? false) ||
+            launchTime(b.item.launchedAt) - launchTime(a.item.launchedAt),
         )
       : projects[category].map((item) => ({ item, category }))
 

@@ -48,12 +48,20 @@ export function ProductGrid({
           >
             {entries.map(({ item, category }) => {
               const accent = CATEGORY_META[category].accent
+              const pinned = item.pinned
+              const featuredLabel = { en: "Our Practice", "zh-Hans": "核心业务", "zh-Hant": "核心業務" }[lang]
               const cardHref = item.url.startsWith("http") ? `/products/${item.id}` : item.url
-              const cardClass =
-                "hover-brutal group flex flex-col rounded-2xl border-[3px] border-black bg-white p-5 shadow-brutal-sm"
+              const cardClass = pinned
+                ? "hover-brutal group flex flex-col rounded-2xl border-[3px] border-[#EF4444] bg-[#0b0b0b] p-5"
+                : "hover-brutal group flex flex-col rounded-2xl border-[3px] border-black bg-white p-5 shadow-brutal-sm"
+              const cardStyle = pinned ? { boxShadow: "5px 5px 0 0 #EF4444" } : undefined
               const inner = (
                 <>
-                  {showCategoryChip ? (
+                  {pinned ? (
+                    <span className="mb-3 inline-flex w-fit items-center gap-1 rounded-full border-2 border-[#EF4444] bg-[#EF4444] px-2.5 py-0.5 text-xs font-bold text-white">
+                      <Sparkles className="h-3 w-3" /> {featuredLabel}
+                    </span>
+                  ) : showCategoryChip ? (
                     <span
                       className="mb-3 inline-block w-fit rounded-full border-2 border-black px-2.5 py-0.5 text-xs font-bold text-black"
                       style={{ backgroundColor: accent }}
@@ -65,21 +73,27 @@ export function ProductGrid({
                   )}
 
                   <div className="mb-2 flex flex-wrap items-center gap-2">
-                    <h3 className="text-lg font-extrabold leading-tight tracking-tight">
+                    <h3
+                      className={`text-lg font-extrabold leading-tight tracking-tight ${pinned ? "text-white" : ""}`}
+                    >
                       {item.title[lang]}
                     </h3>
-                    {item.isNew && (
+                    {item.isNew && !pinned && (
                       <span className="inline-flex items-center gap-1 rounded-full border-2 border-black bg-[#34C759] px-2 py-0.5 text-[11px] font-bold text-white">
                         <Sparkles className="h-3 w-3" /> {b.new}
                       </span>
                     )}
                   </div>
 
-                  <p className="mb-5 line-clamp-4 flex-1 text-sm font-medium leading-relaxed text-[#393939]">
+                  <p
+                    className={`mb-5 line-clamp-4 flex-1 text-sm font-medium leading-relaxed ${pinned ? "text-white/75" : "text-[#393939]"}`}
+                  >
                     {item.description[lang]}
                   </p>
 
-                  <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-bold text-black transition-all group-hover:gap-2.5">
+                  <span
+                    className={`mt-auto inline-flex items-center gap-1.5 text-sm font-bold transition-all group-hover:gap-2.5 ${pinned ? "text-[#FF6B6B]" : "text-black"}`}
+                  >
                     {t.open}
                     <ArrowUpRight className="h-4 w-4" />
                   </span>
@@ -87,7 +101,7 @@ export function ProductGrid({
               )
 
               return (
-                <Link key={item.id} href={cardHref} className={cardClass}>
+                <Link key={item.id} href={cardHref} className={cardClass} style={cardStyle}>
                   {inner}
                 </Link>
               )

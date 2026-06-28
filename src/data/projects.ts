@@ -6,6 +6,7 @@ export type ProjectItem = {
   description: Record<Lang, string>
   url: string // external (https://) opens new tab; internal (/...) opens same tab
   isNew?: boolean
+  pinned?: boolean // sticks to the front of the "all" view + gets the dark featured card style
   launchedAt?: string // YYYY-MM-DD; used to sort the "all" view by launch date
 }
 
@@ -337,6 +338,7 @@ export const projects: ProjectsMap = {
       id: "duolasafe",
       url: "https://duolasafe.manyaitool.com",
       isNew: true,
+      pinned: true,
       title: {
         en: "DuoLaSafe — Web3 Security Audits & Forensics",
         "zh-Hans": "DuoLaSafe — Web3 安全审计与链上取证",
