@@ -4,7 +4,8 @@ export type ToolCategory =
   | "design"
   | "converter"
   | "generator"
-  | "calculator";
+  | "calculator"
+  | "calendar";
 
 export interface ToolContent {
   whatIs: string;

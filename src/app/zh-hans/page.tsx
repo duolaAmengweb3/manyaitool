@@ -4,10 +4,10 @@ import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { HOME_META, HREFLANG_ALTERNATES } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: { absolute: HOME_META.en.title },
-  description: HOME_META.en.description,
+  title: { absolute: HOME_META["zh-Hans"].title },
+  description: HOME_META["zh-Hans"].description,
   alternates: {
-    canonical: "/",
+    canonical: "/zh-hans",
     languages: HREFLANG_ALTERNATES,
   },
 };
@@ -15,8 +15,8 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <HomeJsonLd lang="en" />
-      <SiteHome lang="en" />
+      <HomeJsonLd lang="zh-Hans" />
+      <SiteHome lang="zh-Hans" />
     </>
   );
 }

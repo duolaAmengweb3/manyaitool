@@ -19,6 +19,8 @@ import MarkdownToHtml from "./markdown-to-html";
 import TimestampConverter from "./timestamp-converter";
 import SvgToPng from "./svg-to-png";
 import ImageToBase64 from "./image-to-base64";
+import MoonPhaseCalendar from "./moon-phase-calendar";
+import NationalDaysCalendar from "./national-days-calendar";
 
 register("json-formatter", { default: JsonFormatter });
 register("word-counter", { default: WordCounter });
@@ -31,6 +33,8 @@ register("markdown-to-html", { default: MarkdownToHtml });
 register("timestamp-converter", { default: TimestampConverter });
 register("svg-to-png", { default: SvgToPng });
 register("image-to-base64", { default: ImageToBase64 });
+register("moon-phase-calendar", { default: MoonPhaseCalendar });
+register("national-days-calendar", { default: NationalDaysCalendar });
 
 export function getToolComponent(slug: string): ComponentType | undefined {
   return componentMap[slug];

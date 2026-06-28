@@ -16,6 +16,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   converter: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
   generator: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
   calculator: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  calendar: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
 };
 
 export default function ToolPageClient({ slug }: { slug: string }) {

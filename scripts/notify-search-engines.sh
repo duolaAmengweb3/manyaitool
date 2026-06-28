@@ -7,9 +7,11 @@ SITEMAP_URL="$SITE_URL/sitemap.xml"
 
 echo "📡 Notifying search engines..."
 
-# 1. Ping Google Sitemap
-echo -n "  Google: "
-curl -s -o /dev/null -w "%{http_code}" "https://www.google.com/ping?sitemap=$SITEMAP_URL" && echo " ✓"
+# 1. Google: the sitemap ping endpoint (google.com/ping?sitemap=) was DEPRECATED in
+#    2023 and now does nothing. Google has no deploy-time "notify" API. Submit the
+#    sitemap once in Search Console (https://search.google.com/search-console) and
+#    use URL Inspection > Request Indexing for important pages. Nothing to ping.
+echo "  Google: (ping deprecated — submit sitemap in Search Console instead)"
 
 # 2. Ping Bing via IndexNow
 # IndexNow requires an API key file at /[key].txt

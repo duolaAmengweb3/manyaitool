@@ -1,7 +1,7 @@
-export const SITE_NAME = "ManyAITool";
+export const SITE_NAME = "哆啦A梦的百宝箱 · Doraemon Toolbox";
 export const SITE_URL = "https://manyaitool.com";
 export const SITE_DESCRIPTION =
-  "Free online tools for developers, designers, and everyone. JSON formatter, word counter, color picker, and more.";
+  "AI 助力的百宝工具集 — 涵盖美股、预测市场、永续、Meme、Agent 等方向的实用工具。";
 
 export const CATEGORY_LABELS: Record<string, string> = {
   developer: "Developer Tools",
@@ -10,4 +10,5 @@ export const CATEGORY_LABELS: Record<string, string> = {
   converter: "Converters",
   generator: "Generators",
   calculator: "Calculators",
+  calendar: "Calendars & Time",
 };

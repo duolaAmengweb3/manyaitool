@@ -1,17 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { SITE_NAME } from "@/lib/constants";
 import { useDarkMode } from "@/lib/hooks";
+import { LANGS, LOCALE_PATH, langFromPathname, t } from "@/lib/i18n";
 
 export function Header() {
   const { isDark, toggle } = useDarkMode();
+  const pathname = usePathname();
+  const lang = langFromPathname(pathname || "/");
 
   return (
     <header className="bg-slate-900 dark:bg-slate-950">
       <div className="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-          <img src="/branding/logo-library/manyaitool-logo-transparent.png" alt={SITE_NAME} className="h-9 sm:h-10" />
+          <img src="/branding/logo-library/logoduolai.png" alt={SITE_NAME} className="h-9 sm:h-10 w-auto" />
         </Link>
         <div className="flex items-center gap-4">
           <button
@@ -24,9 +28,23 @@ export function Header() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            Search
+            {t(lang, "header.search")}
             <kbd className="text-xs bg-white/10 px-1.5 py-0.5 rounded">⌘K</kbd>
           </button>
+          <div className="flex items-center rounded-lg bg-white/10 p-0.5 text-xs font-medium">
+            {LANGS.map((l) => (
+              <Link
+                key={l.code}
+                href={LOCALE_PATH[l.code]}
+                aria-current={lang === l.code ? "true" : undefined}
+                className={`px-2 py-1 rounded-md transition-colors ${
+                  lang === l.code ? "bg-white/20 text-white" : "text-slate-400 hover:text-white"
+                }`}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
           <button
             onClick={toggle}
             className="p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
@@ -42,8 +60,8 @@ export function Header() {
               </svg>
             )}
           </button>
-          <Link href="/" className="text-sm text-slate-300 hover:text-white transition-colors">
-            All Tools
+          <Link href={LOCALE_PATH[lang]} className="text-sm text-slate-300 hover:text-white transition-colors">
+            {t(lang, "sec.all")}
           </Link>
         </div>
       </div>

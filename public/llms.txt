@@ -1,6 +1,24 @@
-# ManyAITool
-> Free online tools for developers, designers, and everyone.
-> All tools run 100% in the browser — no data is uploaded to any server.
+# ManyAITool / Doraemon Toolbox
+> An AI + Web3 product-factory toolbox by Doraemon: practical web products for prediction markets, perpetual DEX research, US stocks, AI agents, and everyday browser utilities.
+> The canonical site is https://manyaitool.com . Tools are free to open. Market-related tools organize public data and are not financial advice.
+
+## What this site is
+- Doraemon Toolbox is a public workshop of small, focused web apps.
+- Core themes: AI tools, Web3 tools, Polymarket/Kalshi prediction markets, Hyperliquid and perpetual DEX research, US stock research, and browser utilities.
+- The product-factory strategy: each narrow product gets its own searchable page, solves one concrete workflow, and links back into the wider toolbox.
+
+## Primary product catalog
+- [Product catalog](https://manyaitool.com/#products): Browse all published products by category.
+- [ProofRank — Hyperliquid Vault Check](https://manyaitool.com/products/proofrank): Check Hyperliquid vaults before copying them: real APR, drawdown, recent PnL and plain-language risk verdicts.
+- [PolyBall — Football Markets](https://manyaitool.com/products/polyball): Polymarket football-market research with whale moves and match data.
+- [PolyWeather](https://manyaitool.com/products/polyweather): Weather-model ensemble forecasts for Polymarket weather markets.
+- [PolyMix](https://manyaitool.com/products/polymix): NBA prediction-market odds comparison across Polymarket, Kalshi and major books.
+- [PolyWhale](https://manyaitool.com/products/polywhale): Whale detection across Polymarket and Kalshi.
+- [PerpOIRadar](https://manyaitool.com/products/perpoiradar): Open-interest radar for perpetual futures.
+- [PerpFunding](https://manyaitool.com/products/perpfunding): Cross-exchange funding-rate radar.
+- [HyperSmart](https://manyaitool.com/products/hypersmart): Historical copy-trading research before following a trader.
+- [13F Tracker](https://manyaitool.com/products/13f): US stock 13F and guru-holdings research.
+- [Congress Trading](https://manyaitool.com/products/congress): Congressional stock-trading watch tool.
 
 ## Developer Tools
 - [JSON Formatter](https://manyaitool.com/tools/json-formatter): Format, minify, and validate JSON data instantly
@@ -24,3 +42,18 @@
 
 ## Generators
 - [Lorem Ipsum Generator](https://manyaitool.com/tools/lorem-ipsum-generator): Generate placeholder text by paragraphs, sentences, or words
+
+## Calendars & Time
+- [Moon Phase Calendar](https://manyaitool.com/tools/moon-phase-calendar): See tonight's moon phase, illumination %, and a live countdown to the next full moon, new moon, supermoon & blue moon. Includes the 2026 full moon calendar and .ics export.
+- [National Days Calendar](https://manyaitool.com/tools/national-days-calendar): Find out what national day is today and what's coming up — National Donut Day, Coffee Day, Pizza Day and more, with exact dates, countdowns, and .ics export.
+
+## Full Moon 2026 (per-month & event pages)
+- [Full Moon 2026 hub](https://manyaitool.com/full-moon): All 13 full moons of 2026 with dates, names, supermoons and the blue moon.
+- [Full Moon Calendar 2026](https://manyaitool.com/full-moon/calendar-2026): Complete table of every 2026 full moon date, time and name.
+- [Blue Moon 2026](https://manyaitool.com/full-moon/blue-moon-2026): The only blue moon of 2026 is May 31 (also a micromoon).
+- [Supermoon 2026](https://manyaitool.com/full-moon/supermoon-2026): Three supermoons in 2026 — Jan 3, Nov 24, Dec 23.
+- Per-month pages: https://manyaitool.com/full-moon/{january..december}-2026
+
+## National Days (per-day pages)
+- [National Days Calendar 2026 hub](https://manyaitool.com/national-days): Browse every National Day with exact 2026 dates.
+- Per-day pages, e.g. https://manyaitool.com/national-days/donut-day , /coffee-day , /pizza-day , /taco-day — each with the date for 2026-2028, countdown and .ics.

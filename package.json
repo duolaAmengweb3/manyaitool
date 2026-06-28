@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "node scripts/gen-github-stats.mjs",
     "build": "next build",
     "start": "next start",
     "deploy": "npm run build && bash scripts/deploy.sh"
   },
   "dependencies": {
     "gpt-tokenizer": "^3.4.0",
+    "lucide-react": "^1.17.0",
     "marked": "^18.0.4",
     "next": "16.2.6",
     "react": "19.2.4",

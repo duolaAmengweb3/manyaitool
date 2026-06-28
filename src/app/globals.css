@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme inline {
+  --font-sans: var(--font-onest), "Onest", system-ui, -apple-system, sans-serif;
+
   --color-primary-50: #EEF2FF;
   --color-primary-100: #E0E7FF;
   --color-primary-200: #C7D2FE;
@@ -17,5 +19,223 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-onest), "Onest", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* ── Neo-brutalist design (ported from newduola) ───────────────── */
+
+/* Offset shadow helpers */
+.shadow-brutal {
+  box-shadow: 6px 6px 0px 0px rgba(0, 0, 0, 1);
+}
+.shadow-brutal-sm {
+  box-shadow: 4px 4px 0px 0px rgba(0, 0, 0, 1);
+}
+.shadow-brutal-lg {
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+.hover-brutal {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.hover-brutal:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px rgba(0, 0, 0, 1);
+}
+
+/* Hero mascot display — full-image holographic showcase */
+.mascot-showcase {
+  width: 100%;
+  max-width: 28rem;
+  transform-style: preserve-3d;
+}
+.mascot-showcase__screen {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 4px solid #0b0b0b;
+  border-radius: 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(238, 247, 255, 0.5)),
+    #fffdf7;
+  box-shadow:
+    8px 8px 0 0 rgba(0, 0, 0, 1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.82);
+  perspective: 1100px;
+}
+.mascot-showcase__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: translate3d(0, 0, -110px) rotateY(0deg) scale(0.9);
+  filter: saturate(0.85) blur(1.5px);
+  transition:
+    opacity 520ms ease,
+    transform 620ms cubic-bezier(.2, .8, .2, 1),
+    filter 520ms ease;
+}
+.mascot-showcase__frame[data-active="true"] {
+  opacity: 1;
+  transform: translate3d(0, 0, 42px) rotateY(0deg) scale(1);
+  filter: saturate(1.08) blur(0);
+  z-index: 3;
+}
+.mascot-showcase__frame[data-prev="true"] {
+  opacity: 0.22;
+  transform: translate3d(-10%, 0, -34px) rotateY(18deg) scale(0.91);
+  z-index: 1;
+}
+.mascot-showcase__frame[data-next="true"] {
+  opacity: 0.22;
+  transform: translate3d(10%, 0, -34px) rotateY(-18deg) scale(0.91);
+  z-index: 1;
+}
+.mascot-showcase__scan {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background:
+    linear-gradient(105deg, transparent 0%, rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.62) 48%, rgba(80, 220, 255, 0.24) 52%, transparent 66%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0) 9px, rgba(47, 129, 247, 0.06) 10px);
+  mix-blend-mode: screen;
+  animation: mascot-scan 3.6s linear infinite;
+}
+.mascot-showcase__hud {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.mascot-showcase__hud span {
+  width: 2.5rem;
+  height: 0.45rem;
+  border: 2px solid rgba(11, 11, 11, 0.7);
+  border-radius: 999px;
+  background: rgba(94, 234, 212, 0.72);
+  box-shadow: 0 0 18px rgba(94, 234, 212, 0.55);
+}
+.mascot-showcase__strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+.mascot-showcase__thumb {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 2px solid #0b0b0b;
+  border-radius: 0.65rem;
+  background: #fff;
+  box-shadow: 2px 2px 0 rgba(11, 11, 11, 1);
+  opacity: 0.72;
+  transform: translateY(0);
+  transition: opacity 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+.mascot-showcase__thumb:hover,
+.mascot-showcase__thumb[data-active="true"] {
+  opacity: 1;
+  transform: translateY(-2px);
+  background: #ffc224;
+}
+.mascot-showcase__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@keyframes mascot-scan {
+  from { transform: translateX(-75%); }
+  to { transform: translateX(75%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mascot-showcase__frame,
+  .mascot-showcase__scan {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Ticker marquee — infinite horizontal scroll */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+.ticker-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+.ticker-glass {
+  position: relative;
+  border: 2px solid rgba(11, 11, 11, 0.78);
+  border-radius: 18px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.34) 46%, rgba(255, 255, 255, 0.62)),
+    rgba(255, 253, 247, 0.58);
+  box-shadow:
+    0 14px 34px rgba(11, 11, 11, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -18px 34px rgba(255, 255, 255, 0.28),
+    4px 4px 0 rgba(11, 11, 11, 0.95);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+}
+.ticker-glass::before {
+  content: "";
+  position: absolute;
+  inset: 1px 1px auto 1px;
+  height: 45%;
+  border-radius: 16px 16px 999px 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0));
+  pointer-events: none;
+}
+.ticker-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+
+/* Hide scrollbar but keep scroll (category tab strip) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Site-wide custom scrollbar — neo-brutalist */
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+::-webkit-scrollbar-track {
+  background: #fffdf7;
+}
+::-webkit-scrollbar-thumb {
+  background: #0b0b0b;
+  border-radius: 9999px;
+  border: 3px solid #fffdf7;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #fdb927;
+}
+::-webkit-scrollbar-thumb:active {
+  background: #2f81f7;
+}
+@-moz-document url-prefix() {
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #0b0b0b #fffdf7;
+  }
 }
