@@ -50,7 +50,11 @@ export function ProductGrid({
               const accent = CATEGORY_META[category].accent
               const pinned = item.pinned
               const featuredLabel = { en: "Our Practice", "zh-Hans": "核心业务", "zh-Hant": "核心業務" }[lang]
-              const cardHref = item.url.startsWith("http") ? `/products/${item.id}` : item.url
+              const isExternal = item.url.startsWith("http")
+              // Every card jumps straight to its destination — no /products/[id] interstitial.
+              // External links open in a new tab; internal tool routes open in the same tab.
+              const opensNewTab = isExternal
+              const cardHref = item.url
               const cardClass = pinned
                 ? "hover-brutal group flex flex-col rounded-2xl border-[3px] border-[#EF4444] bg-[#0b0b0b] p-5"
                 : "hover-brutal group flex flex-col rounded-2xl border-[3px] border-black bg-white p-5 shadow-brutal-sm"
@@ -101,7 +105,14 @@ export function ProductGrid({
               )
 
               return (
-                <Link key={item.id} href={cardHref} className={cardClass} style={cardStyle}>
+                <Link
+                  key={item.id}
+                  href={cardHref}
+                  className={cardClass}
+                  style={cardStyle}
+                  target={opensNewTab ? "_blank" : undefined}
+                  rel={opensNewTab ? "noopener noreferrer" : undefined}
+                >
                   {inner}
                 </Link>
               )
