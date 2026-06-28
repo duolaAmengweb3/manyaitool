@@ -335,6 +335,54 @@ export const projects: ProjectsMap = {
   ],
   security: [
     {
+      id: "safecheck-token",
+      url: "https://safecheck.manyaitool.com/token",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Is this real USDT? — Stablecoin authenticity check",
+        "zh-Hans": "这是真 USDT 吗?— 稳定币真伪一键验",
+        "zh-Hant": "這是真 USDT 嗎?— 穩定幣真偽一鍵驗",
+      },
+      description: {
+        en: "Paste any token contract and check it against an all-chain official-stablecoin registry plus our in-house fake-stablecoin blacklist. Address matches official = real; matches our blacklist = scam. Catches counterfeit USDT/USDC — especially on TRON, where most fakes live. Nobody else fuses official-address registry + honeypot + scam intel into one verdict.",
+        "zh-Hans": "粘贴代币合约地址,一键比对全链官方稳定币注册表 + 自有假稳定币黑库。地址对上官方=真,对上黑库=骗局。专治假 USDT/USDC——尤其 TRON 上的假币。没人把官方地址注册表 + 貔貅 + 诈骗情报合成一个结论。",
+        "zh-Hant": "貼上代幣合約地址,一鍵比對全鏈官方穩定幣註冊表 + 自有假穩定幣黑庫。地址對上官方=真,對上黑庫=騙局。專治假 USDT/USDC——尤其 TRON 上的假幣。沒人把官方地址註冊表 + 貔貅 + 詐騙情報合成一個結論。",
+      },
+    },
+    {
+      id: "safecheck-sos",
+      url: "https://safecheck.manyaitool.com/sos",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Wallet drained? — Free self-rescue triage wizard",
+        "zh-Hans": "钱包被盗了?— 免费被盗自救向导",
+        "zh-Hant": "錢包被盜了?— 免費被盜自救嚮導",
+      },
+      description: {
+        en: "A free triage wizard for theft victims: it works out how you were hit, gives prioritized stop-the-bleed steps, flags the attacker address against our intel DB, and auto-generates pre-filled IC3 / Chainabuse / police / exchange-freeze reports. Read-only, Chinese-first, and it never asks for your seed phrase — unlike the recovery scams that prey on victims.",
+        "zh-Hans": "给被盗者的免费问诊向导:判断你属于哪种中招、给按优先级排好的止血步骤、把攻击地址在情报库里打标,并自动生成 IC3 / Chainabuse / 国内报案 / 交易所冻结的预填材料。只读、中文优先、永不索取助记词——区别于专坑受害者的'追回诈骗'。",
+        "zh-Hant": "給被盜者的免費問診嚮導:判斷你屬於哪種中招、給按優先級排好的止血步驟、把攻擊地址在情報庫裡打標,並自動生成 IC3 / Chainabuse / 國內報案 / 交易所凍結的預填材料。只讀、中文優先、永不索取助記詞——區別於專坑受害者的『追回詐騙』。",
+      },
+    },
+    {
+      id: "safecheck-phishing",
+      url: "https://safecheck.manyaitool.com/phishing",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Is this a phishing site? — Domain check + free API",
+        "zh-Hans": "这是钓鱼站吗?— 钓鱼域名查 + 免费 API",
+        "zh-Hant": "這是釣魚站嗎?— 釣魚域名查 + 免費 API",
+      },
+      description: {
+        en: "Check any domain against 440k crypto phishing domains, with parent-domain matching. Free, real-time, open API with no key — wallets and dApps can plug in directly. Undercuts ScamSniffer's $999/mo API and its deliberately 7-day-delayed public blacklist.",
+        "zh-Hans": "输入域名查 44 万条加密钓鱼域名黑库,支持父域名命中。免费、实时、开放 API 无需 key,钱包/dApp 可直接接入。对标 ScamSniffer 的 $999/mo API 和故意延迟 7 天的公开名单。",
+        "zh-Hant": "輸入域名查 44 萬條加密釣魚域名黑庫,支持父域名命中。免費、即時、開放 API 無需 key,錢包/dApp 可直接接入。對標 ScamSniffer 的 $999/mo API 和故意延遲 7 天的公開名單。",
+      },
+    },
+    {
       id: "duolasafe",
       url: "https://duolasafe.manyaitool.com",
       isNew: true,
