@@ -338,9 +338,9 @@ export const projects: ProjectsMap = {
       url: "https://duolasafe.manyaitool.com",
       isNew: true,
       title: {
-        en: "DuoLaSafe — Web3 Security Studio",
-        "zh-Hans": "DuoLaSafe — Web3 安全工作室",
-        "zh-Hant": "DuoLaSafe — Web3 安全工作室",
+        en: "DuoLaSafe — Web3 Security Audits & Forensics",
+        "zh-Hans": "DuoLaSafe — Web3 安全审计与链上取证",
+        "zh-Hant": "DuoLaSafe — Web3 安全審計與鏈上取證",
       },
       description: {
         en: "Smart-contract audits, on-chain forensics and asset-recovery support — every report public, PoC-backed, with an adversarial ruled-out section.",
