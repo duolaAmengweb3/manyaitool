@@ -377,9 +377,9 @@ export const projects: ProjectsMap = {
         "zh-Hant": "錢包授權體檢 — 誰能掏空你的錢包",
       },
       description: {
-        en: "Most thefts trace back to one forgotten approval. Scan a wallet (read-only) for every live token approval and flag the unlimited ones — plus whether the spender is a known drainer / malicious contract, cross-checked against our intel DB and GoPlus. The part Revoke.cash won't tell you.",
-        "zh-Hans": "大多被盗都源于一笔忘了撤的授权。只读扫出钱包所有还生效的授权,标出无限额度,并判断 spender 是不是已知 drainer/恶意合约(查自有情报库 + GoPlus)——这是 Revoke.cash 不会告诉你的。",
-        "zh-Hant": "大多被盜都源於一筆忘了撤的授權。只讀掃出錢包所有還生效的授權,標出無限額度,並判斷 spender 是不是已知 drainer/惡意合約(查自有情報庫 + GoPlus)——這是 Revoke.cash 不會告訴你的。",
+        en: "Most thefts trace back to one forgotten approval. Scan a wallet (read-only) for every live token approval and flag the unlimited ones — plus whether the spender is a known drainer / malicious contract, cross-checked against DuoLaSafe's intel DB and a multi-source risk engine. The part Revoke.cash won't tell you.",
+        "zh-Hans": "大多被盗都源于一笔忘了撤的授权。只读扫出钱包所有还生效的授权,标出无限额度,并判断 spender 是不是已知 drainer/恶意合约(查 DuoLaSafe 自有情报库 + 多源风险引擎)——这是 Revoke.cash 不会告诉你的。",
+        "zh-Hant": "大多被盜都源於一筆忘了撤的授權。只讀掃出錢包所有還生效的授權,標出無限額度,並判斷 spender 是不是已知 drainer/惡意合約(查 DuoLaSafe 自有情報庫 + 多源風險引擎)——這是 Revoke.cash 不會告訴你的。",
       },
     },
     {
@@ -393,9 +393,9 @@ export const projects: ProjectsMap = {
         "zh-Hant": "代幣深度安檢 — 貔貅 / Rug 檢測",
       },
       description: {
-        en: "Paste any token contract for a real on-chain check: honeypot buy/sell simulation, taxes, mint/freeze powers, proxy upgradability — plus deployer reputation against our intel DB (the serial-rugger signal GoPlus misses). Green / yellow / red at a glance; known stablecoins won't false-positive.",
-        "zh-Hans": "粘贴任意代币合约,真链上分析:貔貅买卖模拟、买卖税、增发/冻结权限、proxy 可升级性,再用自有情报库查部署者信誉(GoPlus 漏报的连环 rugger 信号)。绿/黄/红一眼看清,官方稳定币不会误报。",
-        "zh-Hant": "貼上任意代幣合約,真鏈上分析:貔貅買賣模擬、買賣稅、增發/凍結權限、proxy 可升級性,再用自有情報庫查部署者信譽(GoPlus 漏報的連環 rugger 信號)。綠/黃/紅一眼看清,官方穩定幣不會誤報。",
+        en: "Paste any token contract for a real on-chain check: honeypot buy/sell simulation, taxes, mint/freeze powers, proxy upgradability — plus deployer reputation against DuoLaSafe's intel DB (the serial-rugger signal generic scanners miss). Green / yellow / red at a glance; known stablecoins won't false-positive.",
+        "zh-Hans": "粘贴任意代币合约,真链上分析:貔貅买卖模拟、买卖税、增发/冻结权限、proxy 可升级性,再用自有情报库查部署者信誉(通用扫描器漏报的连环 rugger 信号)。绿/黄/红一眼看清,官方稳定币不会误报。",
+        "zh-Hant": "貼上任意代幣合約,真鏈上分析:貔貅買賣模擬、買賣稅、增發/凍結權限、proxy 可升級性,再用自有情報庫查部署者信譽(通用掃描器漏報的連環 rugger 信號)。綠/黃/紅一眼看清,官方穩定幣不會誤報。",
       },
     },
     {
@@ -441,9 +441,9 @@ export const projects: ProjectsMap = {
         "zh-Hant": "這是釣魚站嗎?— 釣魚域名查 + 免費 API",
       },
       description: {
-        en: "Check any domain against 440k crypto phishing domains, with parent-domain matching. Free, real-time, open API with no key — wallets and dApps can plug in directly. Undercuts ScamSniffer's $999/mo API and its deliberately 7-day-delayed public blacklist.",
-        "zh-Hans": "输入域名查 44 万条加密钓鱼域名黑库,支持父域名命中。免费、实时、开放 API 无需 key,钱包/dApp 可直接接入。对标 ScamSniffer 的 $999/mo API 和故意延迟 7 天的公开名单。",
-        "zh-Hant": "輸入域名查 44 萬條加密釣魚域名黑庫,支持父域名命中。免費、即時、開放 API 無需 key,錢包/dApp 可直接接入。對標 ScamSniffer 的 $999/mo API 和故意延遲 7 天的公開名單。",
+        en: "Check any domain against DuoLaSafe's 820k+ phishing & malicious domains, with parent-domain matching. Free, real-time, open API with no key — wallets and dApps can plug in directly. Undercuts the $999/mo, deliberately delayed commercial blacklists.",
+        "zh-Hans": "输入域名查 DuoLaSafe 威胁情报库 82 万+ 钓鱼/恶意域名,支持父域名命中。免费、实时、开放 API 无需 key,钱包/dApp 可直接接入。对标动辄 $999/mo 且数据延迟的商业名单。",
+        "zh-Hant": "輸入域名查 DuoLaSafe 威脅情報庫 82 萬+ 釣魚/惡意域名,支持父域名命中。免費、即時、開放 API 無需 key,錢包/dApp 可直接接入。對標動輒 $999/mo 且數據延遲的商業名單。",
       },
     },
     {
