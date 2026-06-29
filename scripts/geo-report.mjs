@@ -16,10 +16,22 @@ const args = new Map(
 const days = Number(args.get("days") ?? DEFAULT_DAYS);
 const reportDate = formatDate(new Date());
 const outFile = resolve(REPORT_DIR, `${reportDate}-ManyAItools第一方数据报告.md`);
+const latestFile = resolve(REPORT_DIR, "latest-ManyAItools第一方数据报告.md");
 
 const rangeFilter = `datetime(created_at) >= datetime('now', '-${Number.isFinite(days) ? days : DEFAULT_DAYS} days')`;
 
 const queries = {
+  today: `
+    SELECT
+      COUNT(*) AS total_events,
+      SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+      SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
+      SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks,
+      COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN path END) AS viewed_pages,
+      COUNT(DISTINCT NULLIF(referrer_host, '')) AS referrer_hosts
+    FROM geo_events
+    WHERE date(datetime(created_at, '+8 hours')) = date(datetime('now', '+8 hours'));
+  `,
   summary: `
     SELECT
       COUNT(*) AS total_events,
@@ -50,6 +62,31 @@ const queries = {
       AND ${rangeFilter}
     GROUP BY path
     ORDER BY page_views DESC, path ASC
+    LIMIT 20;
+  `,
+  pageFunnel: `
+    WITH page_events AS (
+      SELECT
+        path,
+        SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+        SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
+        SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks
+      FROM geo_events
+      WHERE ${rangeFilter}
+      GROUP BY path
+    )
+    SELECT
+      path,
+      page_views,
+      contact_clicks,
+      outbound_clicks,
+      CASE
+        WHEN page_views = 0 THEN 0
+        ELSE ROUND(CAST(contact_clicks AS REAL) * 100 / page_views, 2)
+      END AS contact_rate_percent
+    FROM page_events
+    WHERE page_views > 0
+    ORDER BY page_views DESC, contact_clicks DESC, outbound_clicks DESC, path ASC
     LIMIT 20;
   `,
   referrers: `
@@ -114,6 +151,7 @@ const data = Object.fromEntries(
 );
 
 const summary = data.summary[0] ?? {};
+const today = data.today[0] ?? {};
 const markdown = [
   "# ManyAItools 第一方数据报告",
   "",
@@ -123,7 +161,22 @@ const markdown = [
   "",
   "## 一句话结论",
   "",
-  summarize(summary),
+  summarize(summary, today),
+  "",
+  "## 今天效果",
+  "",
+  table(
+    ["指标", "今天"],
+    [
+      ["总事件", today.total_events ?? 0],
+      ["页面访问", today.page_views ?? 0],
+      ["被访问页面数", today.viewed_pages ?? 0],
+      ["来源域名数", today.referrer_hosts ?? 0],
+      ["联系点击", today.contact_clicks ?? 0],
+      ["外链点击", today.outbound_clicks ?? 0],
+      ["联系转化率", rate(today.contact_clicks, today.page_views)],
+    ],
+  ),
   "",
   "## 核心指标",
   "",
@@ -136,8 +189,14 @@ const markdown = [
       ["来源域名数", summary.referrer_hosts ?? 0],
       ["联系点击", summary.contact_clicks ?? 0],
       ["外链点击", summary.outbound_clicks ?? 0],
+      ["联系转化率", rate(summary.contact_clicks, summary.page_views)],
+      ["外链点击率", rate(summary.outbound_clicks, summary.page_views)],
     ],
   ),
+  "",
+  "## 今天该看什么",
+  "",
+  actionItems(summary, today, data.pageFunnel),
   "",
   "## 每日事件",
   "",
@@ -146,6 +205,10 @@ const markdown = [
   "## Top 页面",
   "",
   tableFromRows(data.topPages, ["path", "page_views"]),
+  "",
+  "## 页面转化",
+  "",
+  tableFromRows(data.pageFunnel, ["path", "page_views", "contact_clicks", "outbound_clicks", "contact_rate_percent"]),
   "",
   "## 来源域名",
   "",
@@ -178,8 +241,10 @@ const markdown = [
 
 await mkdir(dirname(outFile), { recursive: true });
 await writeFile(outFile, markdown, "utf8");
+await writeFile(latestFile, markdown, "utf8");
 
 console.log(`[geo-report] 写入成功: ${outFile}`);
+console.log(`[geo-report] 最新报告: ${latestFile}`);
 
 function runD1(sql) {
   const env = {
@@ -227,16 +292,66 @@ function escapeCell(value) {
   return String(value ?? "").replace(/\|/g, "\\|").replace(/\n/g, " ");
 }
 
-function summarize(summary) {
+function summarize(summary, today) {
   const pageViews = Number(summary.page_views ?? 0);
   const contactClicks = Number(summary.contact_clicks ?? 0);
   const outboundClicks = Number(summary.outbound_clicks ?? 0);
+  const todayPageViews = Number(today.page_views ?? 0);
+  const todayContactClicks = Number(today.contact_clicks ?? 0);
 
   if (!pageViews) {
     return "最近周期还没有页面访问数据，先确认埋点是否已部署到正式域名。";
   }
 
-  return `最近周期记录到 ${pageViews} 次页面访问、${contactClicks} 次联系点击、${outboundClicks} 次外链点击。下一步重点看哪些页面有访问但没有联系点击。`;
+  return `今天记录到 ${todayPageViews} 次页面访问、${todayContactClicks} 次联系点击；最近周期记录到 ${pageViews} 次页面访问、${contactClicks} 次联系点击、${outboundClicks} 次外链点击。每天重点看联系转化率和“有访问但没联系点击”的页面。`;
+}
+
+function actionItems(summary, today, pageFunnel) {
+  const items = [];
+  const pageViews = Number(summary.page_views ?? 0);
+  const contactClicks = Number(summary.contact_clicks ?? 0);
+  const outboundClicks = Number(summary.outbound_clicks ?? 0);
+  const todayPageViews = Number(today.page_views ?? 0);
+  const todayContactClicks = Number(today.contact_clicks ?? 0);
+  const noContactPages = pageFunnel
+    .filter((row) => Number(row.page_views ?? 0) > 0 && Number(row.contact_clicks ?? 0) === 0)
+    .slice(0, 5)
+    .map((row) => row.path);
+
+  if (todayPageViews > 0 && todayContactClicks === 0) {
+    items.push("今天有访问但没有联系点击：优先补 `/work-with-me` 和首页/产品页 CTA。");
+  }
+
+  if (contactClicks === 0 && pageViews > 0) {
+    items.push("最近周期没有任何联系点击：当前流量还没有被业务承接，服务页和案例页要先上线。");
+  }
+
+  if (noContactPages.length) {
+    items.push(`这些页面有访问但没联系点击：${noContactPages.map((path) => `\`${path}\``).join("、")}。`);
+  }
+
+  if (outboundClicks > contactClicks) {
+    items.push("外链点击多于联系点击：检查用户是不是被外部产品链接带走，业务联系入口要前置。");
+  }
+
+  if (Number(summary.referrer_hosts ?? 0) <= 2) {
+    items.push("来源域名还少：继续补 GSC，一次授权后才能每天看 Google query / 曝光 / 点击。");
+  }
+
+  if (!items.length) {
+    items.push("今天没有明显异常：继续观察 Top 页面和联系点击变化。");
+  }
+
+  return items.map((item) => `- ${item}`).join("\n");
+}
+
+function rate(numerator, denominator) {
+  const top = Number(numerator ?? 0);
+  const bottom = Number(denominator ?? 0);
+  if (!bottom) {
+    return "0%";
+  }
+  return `${((top / bottom) * 100).toFixed(2)}%`;
 }
 
 function formatDate(date) {
