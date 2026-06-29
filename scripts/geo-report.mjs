@@ -319,11 +319,11 @@ function actionItems(summary, today, pageFunnel) {
     .map((row) => row.path);
 
   if (todayPageViews > 0 && todayContactClicks === 0) {
-    items.push("今天有访问但没有联系点击：优先补 `/work-with-me` 和首页/产品页 CTA。");
+    items.push("今天有访问但没有联系点击：检查 `/work-with-me`、首页和产品页的 CTA 是否足够明显。");
   }
 
   if (contactClicks === 0 && pageViews > 0) {
-    items.push("最近周期没有任何联系点击：当前流量还没有被业务承接，服务页和案例页要先上线。");
+    items.push("最近周期没有任何联系点击：服务页已经上线，下一步要观察 CTA 文案、入口位置和联系按钮点击。");
   }
 
   if (noContactPages.length) {
