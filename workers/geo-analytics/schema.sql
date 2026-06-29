@@ -64,3 +64,27 @@ CREATE INDEX IF NOT EXISTS idx_cf_daily_traffic_day
 
 CREATE INDEX IF NOT EXISTS idx_cf_daily_traffic_host_day
   ON cf_daily_traffic(host, day);
+
+CREATE TABLE IF NOT EXISTS geo_action_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  day TEXT NOT NULL,
+  sequence INTEGER NOT NULL DEFAULT 0,
+  category TEXT NOT NULL,
+  action TEXT NOT NULL,
+  target TEXT,
+  status TEXT NOT NULL DEFAULT 'done',
+  owner TEXT NOT NULL DEFAULT 'service',
+  shipped_at TEXT,
+  expected_impact TEXT,
+  evidence TEXT,
+  notes TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(day, sequence, action)
+);
+
+CREATE INDEX IF NOT EXISTS idx_geo_action_logs_day
+  ON geo_action_logs(day);
+
+CREATE INDEX IF NOT EXISTS idx_geo_action_logs_category_day
+  ON geo_action_logs(category, day);

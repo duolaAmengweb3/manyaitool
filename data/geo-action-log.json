@@ -1,0 +1,112 @@
+[
+  {
+    "day": "2026-06-29",
+    "sequence": 10,
+    "category": "站点内容",
+    "action": "上线 GEO 业务承接页",
+    "target": "/about, /work-with-me, /ai-agent-development, /web3-tools-development, /case-studies",
+    "status": "done",
+    "expectedImpact": "让 AI 和潜在客户能明确识别 ManyAItools 是代理开发作品站，不只是工具目录。",
+    "evidence": "业务页和服务页已部署到 manyaitool.com。",
+    "notes": "后续看这些页面的访问、联系点击、搜索 query 和 AI 提及。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 20,
+    "category": "AI 可读",
+    "action": "补齐 AI-readable 文件",
+    "target": "sitemap.xml, llms.txt, ai-index, schema, markdown pages",
+    "status": "done",
+    "expectedImpact": "提高搜索引擎和 AI answer engine 抓取服务定位、案例和业务页面的概率。",
+    "evidence": "sitemap、llms、ai-index、结构化数据和每页 markdown 已接入。",
+    "notes": "后续需要 GSC 和 AI baseline 判断收录与提及变化。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 30,
+    "category": "数据管道",
+    "action": "上线第一方 GEO 埋点",
+    "target": "Cloudflare Worker + D1 geo_events",
+    "status": "done",
+    "expectedImpact": "能每天看到页面访问、联系点击、外链点击、来源域名和国家地区。",
+    "evidence": "D1 geo_events 已有 page_view、click_outbound 等事件。",
+    "notes": "这是后续判断 GEO 是否带来业务行为的主口径。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 40,
+    "category": "历史数据",
+    "action": "导入 Cloudflare 旧流量",
+    "target": "cf_daily_traffic",
+    "status": "done",
+    "expectedImpact": "补齐埋点上线前的历史访问趋势，避免 dashboard 只看到今天。",
+    "evidence": "2026-05-25 到 2026-06-29：173,827 requests、40,480 page views、13,011 daily uniques。",
+    "notes": "CF 旧数据是 zone 级流量，不等同于业务转化。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 50,
+    "category": "监控站",
+    "action": "上线中文 GEO dashboard",
+    "target": "geo-monitor.manyaitool.com",
+    "status": "done",
+    "expectedImpact": "每天能把动作、流量、转化和缺口放在一个看板里对账。",
+    "evidence": "页面 200，/api/summary?days=30 200，/health 200。",
+    "notes": "当前公开访问，页面 noindex,nofollow。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 60,
+    "category": "看板体验",
+    "action": "改成 SaaS dashboard",
+    "target": "GEO monitor frontend",
+    "status": "done",
+    "expectedImpact": "从日志页升级成运营看板，能看趋势、数据源、页面转化、CF 历史和最新事件。",
+    "evidence": "新版 dashboard 已部署并截图验证。",
+    "notes": "本次继续把动作日志从硬编码改成 D1 可追踪数据。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 70,
+    "category": "访问控制",
+    "action": "取消账号密码",
+    "target": "geo-monitor.manyaitool.com",
+    "status": "done",
+    "expectedImpact": "减少自己每天查看 dashboard 的摩擦。",
+    "evidence": "Basic Auth、Cloudflare secret、本地凭据文件已移除；未登录访问 200。",
+    "notes": "如果后续给客户或多人看，再切 Cloudflare Access。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 80,
+    "category": "日报",
+    "action": "生成 30 天中文日报",
+    "target": "manyaitool-geo/reports/latest-ManyAItools第一方数据报告.md",
+    "status": "done",
+    "expectedImpact": "除了线上 dashboard，本地也有固定 Markdown 对账入口。",
+    "evidence": "日报已包含第一方转化和 Cloudflare 历史流量。",
+    "notes": "后续可以把动作日志也写进日报。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 90,
+    "category": "代码交付",
+    "action": "推送 GitHub main",
+    "target": "duolaAmengweb3/manyaitool",
+    "status": "done",
+    "expectedImpact": "线上部署、监控站、导入脚本和日报脚本有版本记录。",
+    "evidence": "相关提交已推送到 main。",
+    "notes": "仓库仍有一个未跟踪 tmp-hero-mascot-prompt.txt，未纳入本次工作。"
+  },
+  {
+    "day": "2026-06-29",
+    "sequence": 100,
+    "category": "文档",
+    "action": "更新 GEO 上线记录和 README",
+    "target": "manyaitool-geo",
+    "status": "done",
+    "expectedImpact": "以后对账时能知道今天做了什么、为什么做、数据在哪看。",
+    "evidence": "13-中文GEO监控站上线记录.md 和 README 已更新。",
+    "notes": "这次会补充动作日志数据化方案。"
+  }
+]

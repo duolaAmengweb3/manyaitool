@@ -144,6 +144,19 @@ const queries = {
     ORDER BY id DESC
     LIMIT 20;
   `,
+  actionLogs: `
+    SELECT
+      day,
+      category,
+      action,
+      COALESCE(target, '') AS target,
+      status,
+      COALESCE(expected_impact, '') AS expected_impact,
+      COALESCE(evidence, '') AS evidence
+    FROM geo_action_logs
+    WHERE date(day) >= date('now', '-${Number.isFinite(days) ? days : DEFAULT_DAYS} days')
+    ORDER BY day DESC, sequence ASC, id ASC;
+  `,
   cfSummary: `
     SELECT
       COUNT(DISTINCT day) AS days,
@@ -219,6 +232,12 @@ const markdown = [
   "## 今天该看什么",
   "",
   actionItems(summary, today, data.pageFunnel),
+  "",
+  "## 服务动作日志",
+  "",
+  "这块记录服务商每天做了哪些 GEO 动作，用来和后续流量、搜索、转化变化对账。",
+  "",
+  tableFromRows(data.actionLogs, ["day", "category", "action", "target", "status", "expected_impact", "evidence"]),
   "",
   "## 每日事件",
   "",

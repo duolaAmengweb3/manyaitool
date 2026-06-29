@@ -80,6 +80,32 @@ type CfTrafficHostRow = {
   edge_response_bytes: number;
 };
 
+type ActionLogRow = {
+  day: string;
+  sequence: number;
+  category: string;
+  action: string;
+  target: string;
+  status: string;
+  owner: string;
+  shipped_at: string;
+  expected_impact: string;
+  evidence: string;
+  notes: string;
+};
+
+type ActionDayRow = {
+  day: string;
+  actions: number;
+  categories: string;
+};
+
+type CfActionSummaryRow = {
+  requests: number;
+  page_views: number;
+  uniques: number;
+};
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -89,16 +115,17 @@ export default {
     }
 
     const days = parseDays(url.searchParams.get("days"));
+    const requestedActionDay = parseActionDay(url.searchParams.get("actionDay"));
 
     if (url.pathname === "/api/summary") {
-      return Response.json(await loadDashboardData(env, days));
+      return Response.json(await loadDashboardData(env, days, requestedActionDay));
     }
 
     if (url.pathname !== "/") {
       return Response.redirect(url.origin, 302);
     }
 
-    const data = await loadDashboardData(env, days);
+    const data = await loadDashboardData(env, days, requestedActionDay);
     return new Response(renderDashboard(data), {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
@@ -109,9 +136,14 @@ export default {
   },
 };
 
-async function loadDashboardData(env: Env, days: number) {
+async function loadDashboardData(env: Env, days: number, requestedActionDay: string) {
   const range = `-${days} days`;
-  const [today, period, trend, pages, referrers, countries, latest, cfSummary, cfTrend, cfHosts] = await Promise.all([
+  const latestActionDay = await first<{ day: string }>(
+    env,
+    "SELECT day FROM geo_action_logs GROUP BY day ORDER BY day DESC LIMIT 1",
+  );
+  const selectedActionDay = parseActionDay(requestedActionDay) || parseActionDay(latestActionDay?.day ?? "") || shanghaiDate(new Date());
+  const [today, period, trend, pages, referrers, countries, latest, cfSummary, cfTrend, cfHosts, actionDays, actionLogs, actionDaySummary, actionWindowSummary, cfActionDay, cfPreviousDay, cfActionWindow] = await Promise.all([
     first<SummaryRow>(
       env,
       `SELECT
@@ -255,6 +287,88 @@ async function loadDashboardData(env: Env, days: number) {
        ORDER BY requests DESC
        LIMIT 10`,
     ),
+    all<ActionDayRow>(
+      env,
+      `SELECT
+        day,
+        COUNT(*) AS actions,
+        GROUP_CONCAT(DISTINCT category) AS categories
+       FROM geo_action_logs
+       GROUP BY day
+       ORDER BY day DESC
+       LIMIT 90`,
+    ),
+    all<ActionLogRow>(
+      env,
+      `SELECT
+        day,
+        sequence,
+        category,
+        action,
+        COALESCE(target, '') AS target,
+        status,
+        owner,
+        COALESCE(shipped_at, '') AS shipped_at,
+        COALESCE(expected_impact, '') AS expected_impact,
+        COALESCE(evidence, '') AS evidence,
+        COALESCE(notes, '') AS notes
+       FROM geo_action_logs
+       WHERE day = '${selectedActionDay}'
+       ORDER BY sequence ASC, id ASC`,
+    ),
+    first<SummaryRow>(
+      env,
+      `SELECT
+        COUNT(*) AS total_events,
+        SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+        SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
+        SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks,
+        COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN path END) AS viewed_pages,
+        COUNT(DISTINCT NULLIF(referrer_host, '')) AS referrer_hosts
+       FROM geo_events
+       WHERE date(datetime(created_at, '+8 hours')) = date('${selectedActionDay}')`,
+    ),
+    first<SummaryRow>(
+      env,
+      `SELECT
+        COUNT(*) AS total_events,
+        SUM(CASE WHEN event_type = 'page_view' THEN 1 ELSE 0 END) AS page_views,
+        SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
+        SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks,
+        COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN path END) AS viewed_pages,
+        COUNT(DISTINCT NULLIF(referrer_host, '')) AS referrer_hosts
+       FROM geo_events
+       WHERE date(datetime(created_at, '+8 hours')) >= date('${selectedActionDay}')
+         AND date(datetime(created_at, '+8 hours')) < date('${selectedActionDay}', '+7 days')`,
+    ),
+    first<CfActionSummaryRow>(
+      env,
+      `SELECT
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques
+       FROM cf_daily_traffic
+       WHERE day = date('${selectedActionDay}')`,
+    ),
+    first<CfActionSummaryRow>(
+      env,
+      `SELECT
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques
+       FROM cf_daily_traffic
+       WHERE day = date('${selectedActionDay}', '-1 day')`,
+    ),
+    first<CfActionSummaryRow>(
+      env,
+      `SELECT
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques
+       FROM cf_daily_traffic
+       WHERE day >= date('${selectedActionDay}')
+         AND day < date('${selectedActionDay}', '+7 days')`,
+    ),
   ]);
 
   const safeToday = normalizeSummary(today);
@@ -282,6 +396,18 @@ async function loadDashboardData(env: Env, days: number) {
       trend: cfTrend.map(normalizeCfTrafficTrend),
       hosts: cfHosts.map(normalizeCfTrafficHost),
     },
+    actionLog: {
+      selectedDay: selectedActionDay,
+      days: actionDays.map(normalizeActionDay),
+      entries: actionLogs.map(normalizeActionLog),
+      impact: {
+        actionDay: normalizeSummary(actionDaySummary),
+        actionWindow: normalizeSummary(actionWindowSummary),
+        cfActionDay: normalizeCfActionSummary(cfActionDay),
+        cfPreviousDay: normalizeCfActionSummary(cfPreviousDay),
+        cfActionWindow: normalizeCfActionSummary(cfActionWindow),
+      },
+    },
     actions: buildActions(safeToday, safePeriod, pages.map(normalizePage)),
   };
 }
@@ -290,20 +416,8 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
   const today = data.today;
   const period = data.period;
   const cfTraffic = data.cfTraffic.summary;
+  const actionLog = data.actionLog;
   const topNoContact = data.pages.filter((page) => page.page_views > 0 && page.contact_clicks === 0).slice(0, 8);
-  const todayActions = [
-    ["站点", "上线 GEO 业务承接页", "已完成", "/about、/work-with-me、/ai-agent-development、/web3-tools-development、/case-studies 已部署。"],
-    ["AI 可读", "补齐 AI-readable 文件", "已完成", "sitemap、llms.txt、ai-index、schema、每页 markdown 已接入。"],
-    ["埋点", "上线第一方数据管道", "已完成", "Cloudflare Worker + D1 `geo_events` 记录 page_view、联系点击、外链点击。"],
-    ["日报", "生成 30 天中文日报", "已完成", "latest-ManyAItools第一方数据报告.md 已包含第一方转化和 CF 历史流量。"],
-    ["历史数据", "导入 Cloudflare 旧流量", "已完成", "2026-05-25 到 2026-06-29：173,827 requests、40,480 page views、13,011 daily uniques。"],
-    ["监控站", "上线中文 GEO dashboard", "已完成", "geo-monitor.manyaitool.com 已上线，读取 D1 和 CF 历史流量。"],
-    ["看板", "改成 SaaS dashboard", "已完成", "增加时间范围、趋势、数据源、页面转化、最新日志、CF 历史流量。"],
-    ["访问", "取消账号密码", "已完成", "删除 Basic Auth、Cloudflare secret 和本地凭据文件，现在直接打开 URL。"],
-    ["验证", "线上接口验证", "已完成", "页面 200、/api/summary?days=30 200、/health 200。"],
-    ["代码", "推送 GitHub main", "已完成", "监控站、CF 导入脚本、日报脚本和认证移除代码已推送。"],
-    ["文档", "更新上线记录和 README", "已完成", "manyaitool-geo 文档已记录 dashboard、CF 历史流量、公开访问状态。"],
-  ];
   const workItems = [
     ["数据管道", "Cloudflare Worker + D1 第一方埋点", "已上线", "记录页面访问、来源域名、国家、联系点击、外链点击。"],
     ["自动汇总", "Worker cron + geo_daily_metrics", "已上线", "每天 UTC 00:15 汇总前一天事件，便于周报/月报。"],
@@ -371,6 +485,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
     .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; padding: 0 11px; font-size: 13px; font-weight: 850; text-decoration: none; }
     .btn.primary, .btn.active { border-color: var(--blue); background: var(--blue); color: white; }
     .btn.subtle { background: transparent; }
+    .dateTabs { display: flex; flex-wrap: wrap; gap: 8px; }
     .section { margin-top: 18px; }
     .sectionHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
     .sectionHead h3 { margin: 0; font-size: 18px; }
@@ -386,6 +501,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
     .metric.good strong { color: var(--green); }
     .metric.warn strong { color: var(--red); }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .actionLayout { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr); gap: 12px; }
     .tri { display: grid; grid-template-columns: 1.1fr .9fr .9fr; gap: 12px; }
     .card { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 16px; }
     .wide { grid-column: 1 / -1; }
@@ -422,7 +538,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
       .app { grid-template-columns: 1fr; }
       .sidebar { position: static; height: auto; }
       .sideMeta { position: static; margin-top: 18px; }
-      .tri, .grid { grid-template-columns: 1fr; }
+      .tri, .grid, .actionLayout { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .sourceGrid { grid-template-columns: 1fr 1fr; }
     }
@@ -449,7 +565,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
       </div>
       <nav class="nav">
         <a class="active" href="#overview">总览</a>
-        <a href="#today-actions">今日动作</a>
+        <a href="#today-actions">动作日志</a>
         <a href="#trend">趋势</a>
         <a href="#cf-history">CF 历史</a>
         <a href="#worklog">已完成</a>
@@ -471,12 +587,12 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
           <p>看我们做了什么、现在数据在哪里、趋势有没有变化。当前同时展示 Cloudflare 历史流量和 D1 第一方转化埋点。</p>
         </div>
         <nav class="toolbar">
-          ${rangeLink(1, data.rangeDays)}
-          ${rangeLink(7, data.rangeDays)}
-          ${rangeLink(14, data.rangeDays)}
-          ${rangeLink(30, data.rangeDays)}
+          ${rangeLink(1, data.rangeDays, actionLog.selectedDay)}
+          ${rangeLink(7, data.rangeDays, actionLog.selectedDay)}
+          ${rangeLink(14, data.rangeDays, actionLog.selectedDay)}
+          ${rangeLink(30, data.rangeDays, actionLog.selectedDay)}
           <a class="btn subtle" href="https://manyaitool.com/work-with-me" target="_blank" rel="noreferrer">业务页</a>
-          <a class="btn subtle" href="/api/summary?days=${escapeHtml(String(data.rangeDays))}">JSON</a>
+          <a class="btn subtle" href="/api/summary?days=${escapeHtml(String(data.rangeDays))}&actionDay=${escapeHtml(actionLog.selectedDay)}">JSON</a>
         </nav>
       </header>
 
@@ -493,12 +609,39 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
 
       <section class="section" id="today-actions">
         <div class="sectionHead">
-          <h3>今天做了什么动作</h3>
-          <p>2026-06-29，当天工程动作和验证结果。</p>
+          <div>
+            <h3>服务动作日志</h3>
+            <p>服务商每天做了哪些 GEO 动作，和当天 / 后续数据放在一起对账。当前日期：${escapeHtml(actionLog.selectedDay)}</p>
+          </div>
+          <nav class="dateTabs">${actionDayLinks(actionLog.days, actionLog.selectedDay, data.rangeDays)}</nav>
         </div>
-        <article class="card">
-          ${table(["模块", "动作", "状态", "结果"], todayActions.map((row) => [row[0], row[1], status(row[2]), row[3]]))}
-        </article>
+        <div class="actionLayout">
+          <article class="card">
+            <h3>${escapeHtml(actionLog.selectedDay)} 做了什么</h3>
+            <p class="cardLead">这里记录的是服务动作，不是流量数据。比如写了什么页面、改了什么结构、接了什么数据、做了什么部署。</p>
+            ${renderActionLogTable(actionLog.entries)}
+          </article>
+          <article class="card">
+            <h3>数据影响对账</h3>
+            <p class="cardLead">先把动作和数据放在同一日期旁边。真正判断影响，要看当天之后 7 / 14 / 30 天趋势。</p>
+            <div class="miniMetrics">
+              ${metric("动作数", actionLog.entries.length, "", "服务动作条数")}
+              ${metric("当天 D1 PV", actionLog.impact.actionDay.page_views, "", "第一方 page_view")}
+              ${metric("后续7天 D1 PV", actionLog.impact.actionWindow.page_views, "", "动作日起 7 天")}
+              ${metric("当天 CF PV", formatInt(actionLog.impact.cfActionDay.page_views), "", "Cloudflare pageViews")}
+            </div>
+            ${table(
+              ["口径", "前一天", "动作当天", "后续7天"],
+              [
+                ["CF page views", formatInt(actionLog.impact.cfPreviousDay.page_views), formatInt(actionLog.impact.cfActionDay.page_views), formatInt(actionLog.impact.cfActionWindow.page_views)],
+                ["CF requests", formatInt(actionLog.impact.cfPreviousDay.requests), formatInt(actionLog.impact.cfActionDay.requests), formatInt(actionLog.impact.cfActionWindow.requests)],
+                ["D1 page_view", "-", actionLog.impact.actionDay.page_views, actionLog.impact.actionWindow.page_views],
+                ["D1 联系点击", "-", actionLog.impact.actionDay.contact_clicks, actionLog.impact.actionWindow.contact_clicks],
+                ["D1 外链点击", "-", actionLog.impact.actionDay.outbound_clicks, actionLog.impact.actionWindow.outbound_clicks],
+              ],
+            )}
+          </article>
+        </div>
       </section>
 
       <section class="section tri">
@@ -646,6 +789,13 @@ function parseDays(value: string | null): number {
   return 7;
 }
 
+function parseActionDay(value: string | null): string {
+  if (!value) {
+    return "";
+  }
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
+}
+
 async function first<T>(env: Env, sql: string): Promise<T | null> {
   return env.DB.prepare(sql).first<T>();
 }
@@ -711,6 +861,38 @@ function normalizeCfTrafficHost(row: CfTrafficHostRow): CfTrafficHostRow {
   };
 }
 
+function normalizeActionDay(row: ActionDayRow): ActionDayRow {
+  return {
+    day: row.day ?? "",
+    actions: Number(row.actions ?? 0),
+    categories: row.categories ?? "",
+  };
+}
+
+function normalizeActionLog(row: ActionLogRow): ActionLogRow {
+  return {
+    day: row.day ?? "",
+    sequence: Number(row.sequence ?? 0),
+    category: row.category ?? "",
+    action: row.action ?? "",
+    target: row.target ?? "",
+    status: row.status ?? "",
+    owner: row.owner ?? "",
+    shipped_at: row.shipped_at ?? "",
+    expected_impact: row.expected_impact ?? "",
+    evidence: row.evidence ?? "",
+    notes: row.notes ?? "",
+  };
+}
+
+function normalizeCfActionSummary(row: CfActionSummaryRow | null): CfActionSummaryRow {
+  return {
+    requests: Number(row?.requests ?? 0),
+    page_views: Number(row?.page_views ?? 0),
+    uniques: Number(row?.uniques ?? 0),
+  };
+}
+
 function normalizePage(row: PageRow): PageRow {
   return {
     path: row.path ?? "",
@@ -737,8 +919,21 @@ function status(value: string): string {
   return `<span class="status ${cls}">${escapeHtml(value)}</span>`;
 }
 
-function rangeLink(days: number, activeDays: number): string {
-  return `<a class="btn ${days === activeDays ? "active" : "subtle"}" href="/?days=${days}">${days === 1 ? "今天" : `${days}天`}</a>`;
+function rangeLink(days: number, activeDays: number, actionDay: string): string {
+  return `<a class="btn ${days === activeDays ? "active" : "subtle"}" href="/?days=${days}&actionDay=${escapeHtml(actionDay)}">${days === 1 ? "今天" : `${days}天`}</a>`;
+}
+
+function actionDayLinks(days: ActionDayRow[], selectedDay: string, rangeDays: number): string {
+  if (!days.length) {
+    return `<span class="empty">暂无动作日期</span>`;
+  }
+  return days
+    .map((row) => {
+      const label = `${row.day} · ${row.actions}`;
+      const active = row.day === selectedDay ? "active" : "subtle";
+      return `<a class="btn ${active}" href="/?days=${rangeDays}&actionDay=${escapeHtml(row.day)}">${escapeHtml(label)}</a>`;
+    })
+    .join("");
 }
 
 function table(headers: string[], rows: Array<Array<string | number>>): string {
@@ -748,6 +943,23 @@ function table(headers: string[], rows: Array<Array<string | number>>): string {
   return `<table><thead><tr>${headers.map((item) => `<th>${escapeHtml(item)}</th>`).join("")}</tr></thead><tbody>${rows
     .map((row) => `<tr>${row.map((item) => `<td>${typeof item === "string" && item.startsWith("<") ? item : escapeHtml(String(item))}</td>`).join("")}</tr>`)
     .join("")}</tbody></table>`;
+}
+
+function renderActionLogTable(rows: ActionLogRow[]): string {
+  if (!rows.length) {
+    return `<p class="empty">这一天还没有服务动作日志。先在 data/geo-action-log.json 里追加，再运行 npm run geo:actions-import。</p>`;
+  }
+
+  return table(
+    ["类型", "动作", "目标", "预期影响", "证据 / 备注"],
+    rows.map((row) => [
+      row.category,
+      `<strong>${escapeHtml(row.action)}</strong><br>${status(statusLabel(row.status))}`,
+      code(row.target),
+      row.expected_impact,
+      [row.evidence, row.notes].filter(Boolean).join(" / "),
+    ]),
+  );
 }
 
 function renderTrend(rows: TrendRow[]): string {
@@ -810,6 +1022,23 @@ function formatShanghai(value: string): string {
     second: "2-digit",
     hour12: false,
   }).format(date);
+}
+
+function shanghaiDate(date: Date): string {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+function statusLabel(value: string): string {
+  const normalized = value.toLowerCase();
+  if (normalized === "done" || normalized === "completed" || value === "已完成") return "已完成";
+  if (normalized === "doing" || normalized === "in_progress" || value === "进行中") return "进行中";
+  if (normalized === "planned" || value === "计划中") return "计划中";
+  return value || "已完成";
 }
 
 function escapeHtml(value: string): string {

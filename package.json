@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "geo:cf-import": "node scripts/import-cf-analytics.mjs",
+    "geo:actions-import": "node scripts/import-geo-action-log.mjs",
     "geo:report": "node scripts/geo-report.mjs",
     "deploy": "npm run build && bash scripts/deploy.sh"
   },
