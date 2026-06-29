@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "manyaitool-geo-monitor",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-29",
+  "observability": {
+    "enabled": true
+  },
+  "routes": [
+    {
+      "pattern": "geo-monitor.manyaitool.com",
+      "custom_domain": true
+    }
+  ],
+  "vars": {
+    "MONITOR_USER": "duola"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "manyaitool-geo-analytics",
+      "database_id": "443ff1cd-9b25-4cd4-af10-dc48e6edc11a"
+    }
+  ]
+}
