@@ -1,0 +1,4 @@
+Contact: https://x.com/hunterweb303
+Preferred-Languages: en, zh
+Canonical: https://manyaitool.com/.well-known/security.txt
+Expires: 2027-06-29T00:00:00Z
