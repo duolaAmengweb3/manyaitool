@@ -9,6 +9,7 @@ export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const tools = getAllMetas();
+  const projects = getExternalProjectEntries();
   const now = new Date();
   const monthly = "monthly" as const;
 
@@ -19,11 +20,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }));
 
-  const projectUrls = getExternalProjectEntries().map(({ item }) => ({
+  const projectUrls = projects.map(({ item }) => ({
     url: `${SITE_URL}/products/${item.id}`,
     lastModified: item.launchedAt ? new Date(`${item.launchedAt}T00:00:00Z`) : now,
     changeFrequency: monthly,
     priority: item.isNew ? 0.85 : 0.65,
+  }));
+
+  const aiFileUrls = ["llms.txt", "llms-full.txt", "ai-index.json", "schema.json"].map((file) => ({
+    url: `${SITE_URL}/${file}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  const toolMarkdownUrls = tools.map((tool) => ({
+    url: `${SITE_URL}/tools/${tool.slug}/index.md`,
+    lastModified: now,
+    changeFrequency: monthly,
+    priority: 0.45,
+  }));
+
+  const productMarkdownUrls = projects.map(({ item }) => ({
+    url: `${SITE_URL}/products/${item.id}/index.md`,
+    lastModified: item.launchedAt ? new Date(`${item.launchedAt}T00:00:00Z`) : now,
+    changeFrequency: monthly,
+    priority: 0.4,
   }));
 
   const nationalDayUrls = [
@@ -63,5 +85,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...toolUrls,
     ...nationalDayUrls,
     ...moonUrls,
+    ...aiFileUrls,
+    ...productMarkdownUrls,
+    ...toolMarkdownUrls,
   ];
 }
