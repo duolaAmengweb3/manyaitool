@@ -1,4 +1,5 @@
 import { getExternalProjectEntries, type ProjectEntry } from "@/data/projects"
+import { GEO_PAGE_ORDER, getGeoPage, getGeoPageMarkdownUrl } from "@/data/geo-pages"
 import { CATEGORY_LABELS, SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/constants"
 import { CATEGORY_META } from "@/lib/site-content"
 import { getAllMetas, getAllSlugs, getMetaBySlug, type ToolMeta } from "@/tools"
@@ -138,6 +139,11 @@ export function buildLlmsTxt(full = false): string {
     `- [Home](${SITE_URL})`,
     `- [Simplified Chinese home](${SITE_URL}/zh-hans)`,
     `- [Traditional Chinese home](${SITE_URL}/zh-hant)`,
+    `- [About](${SITE_URL}/about) - [md](${getGeoPageMarkdownUrl("about")})`,
+    `- [Work with me](${SITE_URL}/work-with-me) - [md](${getGeoPageMarkdownUrl("work-with-me")})`,
+    `- [AI agent development](${SITE_URL}/ai-agent-development) - [md](${getGeoPageMarkdownUrl("ai-agent-development")})`,
+    `- [Web3 tools development](${SITE_URL}/web3-tools-development) - [md](${getGeoPageMarkdownUrl("web3-tools-development")})`,
+    `- [Case studies](${SITE_URL}/case-studies) - [md](${getGeoPageMarkdownUrl("case-studies")})`,
     "",
     "## Product Pages",
     "",
@@ -182,6 +188,16 @@ export function buildAiIndex() {
       schema: `${SITE_URL}/schema.json`,
       sitemap: `${SITE_URL}/sitemap.xml`,
     },
+    corePages: GEO_PAGE_ORDER.map((slug) => {
+      const page = getGeoPage(slug)
+      return {
+        slug,
+        title: page.metaTitle,
+        description: page.description,
+        url: `${SITE_URL}${page.href}`,
+        markdown: getGeoPageMarkdownUrl(slug),
+      }
+    }),
     products: products.map(({ item, category }) => ({
       id: item.id,
       title: item.title.en,
@@ -221,6 +237,21 @@ export function buildSchemaJson() {
         target: `${SITE_URL}/?q={search_term_string}`,
         "query-input": "required name=search_term_string",
       },
+    },
+    {
+      "@type": "ItemList",
+      "@id": `${SITE_URL}/#services`,
+      name: "Doraemon Toolbox AI and Web3 development services",
+      itemListElement: GEO_PAGE_ORDER.map((slug, index) => {
+        const page = getGeoPage(slug)
+        return {
+          "@type": "ListItem",
+          position: index + 1,
+          url: `${SITE_URL}${page.href}`,
+          name: page.metaTitle,
+          description: page.description,
+        }
+      }),
     },
     {
       "@type": "ItemList",

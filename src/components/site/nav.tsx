@@ -23,6 +23,15 @@ export function SiteNav({ lang }: { lang: Lang }) {
           </span>
         </Link>
 
+        <div className="hidden items-center gap-3 md:flex">
+          <Link href="/work-with-me" className="text-sm font-black hover:underline">
+            Work with me
+          </Link>
+          <Link href="/case-studies" className="text-sm font-black hover:underline">
+            Cases
+          </Link>
+        </div>
+
         <div className="flex items-center gap-2">
           <div className="flex items-center rounded-lg border-2 border-black bg-white overflow-hidden">
             {LANGS.map((l, i) => (
