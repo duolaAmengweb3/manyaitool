@@ -64,15 +64,17 @@ export default {
       return unauthorized();
     }
 
+    const days = parseDays(url.searchParams.get("days"));
+
     if (url.pathname === "/api/summary") {
-      return Response.json(await loadDashboardData(env));
+      return Response.json(await loadDashboardData(env, days));
     }
 
     if (url.pathname !== "/") {
       return Response.redirect(url.origin, 302);
     }
 
-    const data = await loadDashboardData(env);
+    const data = await loadDashboardData(env, days);
     return new Response(renderDashboard(data), {
       headers: {
         "Content-Type": "text/html; charset=utf-8",
@@ -83,7 +85,8 @@ export default {
   },
 };
 
-async function loadDashboardData(env: Env) {
+async function loadDashboardData(env: Env, days: number) {
+  const range = `-${days} days`;
   const [today, period, trend, pages, referrers, countries, latest] = await Promise.all([
     first<SummaryRow>(
       env,
@@ -107,7 +110,7 @@ async function loadDashboardData(env: Env) {
         COUNT(DISTINCT CASE WHEN event_type = 'page_view' THEN path END) AS viewed_pages,
         COUNT(DISTINCT NULLIF(referrer_host, '')) AS referrer_hosts
        FROM geo_events
-       WHERE datetime(created_at) >= datetime('now', '-7 days')`,
+       WHERE datetime(created_at) >= datetime('now', '${range}')`,
     ),
     all<TrendRow>(
       env,
@@ -117,10 +120,10 @@ async function loadDashboardData(env: Env) {
         SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
         SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks
        FROM geo_events
-       WHERE datetime(created_at) >= datetime('now', '-7 days')
+       WHERE datetime(created_at) >= datetime('now', '${range}')
        GROUP BY date(datetime(created_at, '+8 hours'))
        ORDER BY day DESC
-       LIMIT 7`,
+       LIMIT ${days}`,
     ),
     all<PageRow>(
       env,
@@ -131,7 +134,7 @@ async function loadDashboardData(env: Env) {
           SUM(CASE WHEN event_type LIKE 'click_contact_%' THEN 1 ELSE 0 END) AS contact_clicks,
           SUM(CASE WHEN event_type = 'click_outbound' THEN 1 ELSE 0 END) AS outbound_clicks
         FROM geo_events
-        WHERE datetime(created_at) >= datetime('now', '-7 days')
+        WHERE datetime(created_at) >= datetime('now', '${range}')
         GROUP BY path
       )
       SELECT
@@ -154,7 +157,7 @@ async function loadDashboardData(env: Env) {
         COALESCE(NULLIF(referrer_host, ''), '(direct / unknown)') AS label,
         COUNT(*) AS events
        FROM geo_events
-       WHERE datetime(created_at) >= datetime('now', '-7 days')
+       WHERE datetime(created_at) >= datetime('now', '${range}')
        GROUP BY COALESCE(NULLIF(referrer_host, ''), '(direct / unknown)')
        ORDER BY events DESC
        LIMIT 20`,
@@ -165,7 +168,7 @@ async function loadDashboardData(env: Env) {
         COALESCE(NULLIF(country, ''), '(unknown)') AS label,
         COUNT(*) AS events
        FROM geo_events
-       WHERE datetime(created_at) >= datetime('now', '-7 days')
+       WHERE datetime(created_at) >= datetime('now', '${range}')
        GROUP BY COALESCE(NULLIF(country, ''), '(unknown)')
        ORDER BY events DESC
        LIMIT 20`,
@@ -190,6 +193,7 @@ async function loadDashboardData(env: Env) {
 
   return {
     generatedAt: new Date().toISOString(),
+    rangeDays: days,
     today: safeToday,
     period: safePeriod,
     trend: trend.map(normalizeTrend),
@@ -212,6 +216,23 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
   const today = data.today;
   const period = data.period;
   const topNoContact = data.pages.filter((page) => page.page_views > 0 && page.contact_clicks === 0).slice(0, 8);
+  const workItems = [
+    ["数据管道", "Cloudflare Worker + D1 第一方埋点", "已上线", "记录页面访问、来源域名、国家、联系点击、外链点击。"],
+    ["自动汇总", "Worker cron + geo_daily_metrics", "已上线", "每天 UTC 00:15 汇总前一天事件，便于周报/月报。"],
+    ["公开 GEO", "5 个业务承接页 + 5 个 markdown 页", "已上线", "/about、/work-with-me、/ai-agent-development、/web3-tools-development、/case-studies。"],
+    ["AI 可读", "sitemap / llms.txt / ai-index / schema", "已上线", "让搜索引擎和 AI answer engine 能发现服务页和案例页。"],
+    ["对账", "中文 GEO 监控站", "已上线", "当前页面，读取 D1 实时数据。"],
+    ["搜索", "Google Search Console", "待接入", "需要一次授权后接入 query、曝光、点击、排名。"],
+    ["AI 基线", "OpenAI / Perplexity prompt baseline", "待接入", "后续有 API 预算后接入 AI 提及率和竞品同框。"],
+  ];
+  const dataSources = [
+    ["D1 原始事件", "geo_events", "已接入", "页面访问、点击、来源、国家、浏览器。"],
+    ["D1 日汇总", "geo_daily_metrics", "已接入", "每天自动汇总，后续做长期趋势。"],
+    ["JSON 接口", "/api/summary", "已接入", "当前看板同源 JSON 数据。"],
+    ["本地日报", "manyaitool-geo/reports/latest-*.md", "已接入", "固定 Markdown 日报入口。"],
+    ["GSC", "Search Console API", "待接入", "搜索 query、曝光、点击、CTR、排名。"],
+    ["GA4", "Analytics Data API", "可选", "更标准的 session 和渠道归因。"],
+  ];
 
   return `<!doctype html>
 <html lang="zh-CN">
@@ -223,155 +244,243 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
   <style>
     :root {
       color-scheme: light;
-      --bg: #f6f2e8;
-      --panel: #fffdf7;
-      --ink: #111;
-      --muted: #666;
-      --line: #111;
-      --yellow: #ffc224;
-      --blue: #2f81f7;
-      --red: #ef4444;
-      --green: #16a34a;
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --ink: #14171f;
+      --muted: #687080;
+      --line: #d9dee7;
+      --line-strong: #aeb6c4;
+      --blue: #2364e8;
+      --blue-soft: #e9efff;
+      --yellow: #f6c343;
+      --green: #138a43;
+      --green-soft: #e8f6ee;
+      --red: #c93535;
+      --red-soft: #fae9e9;
+      --purple: #7152cc;
     }
     * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body { margin: 0; background: var(--bg); color: var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     a { color: inherit; }
-    .shell { max-width: 1280px; margin: 0 auto; padding: 22px; }
-    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 3px solid var(--line); background: white; border-radius: 12px; padding: 14px 16px; box-shadow: 5px 5px 0 #111; }
-    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
-    .mark { width: 38px; height: 38px; display: grid; place-items: center; border: 2px solid #111; border-radius: 9px; background: var(--yellow); font-weight: 1000; }
-    .brand h1 { margin: 0; font-size: 20px; line-height: 1.1; }
-    .brand p { margin: 2px 0 0; color: var(--muted); font-size: 12px; font-weight: 700; }
+    .app { min-height: 100vh; display: grid; grid-template-columns: 248px minmax(0, 1fr); }
+    .sidebar { position: sticky; top: 0; height: 100vh; border-right: 1px solid var(--line); background: #111827; color: #fff; padding: 18px 14px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 8px 6px 18px; border-bottom: 1px solid rgba(255,255,255,.14); }
+    .mark { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; background: var(--yellow); color: #111; font-weight: 900; }
+    .brand h1 { margin: 0; font-size: 15px; line-height: 1.2; }
+    .brand p { margin: 2px 0 0; color: rgba(255,255,255,.62); font-size: 12px; font-weight: 700; }
+    .nav { display: grid; gap: 4px; margin-top: 16px; }
+    .nav a { display: flex; align-items: center; min-height: 34px; border-radius: 6px; padding: 0 10px; color: rgba(255,255,255,.78); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .nav a:hover, .nav a.active { background: rgba(255,255,255,.10); color: #fff; }
+    .sideMeta { position: absolute; left: 14px; right: 14px; bottom: 18px; border-top: 1px solid rgba(255,255,255,.14); padding-top: 12px; color: rgba(255,255,255,.62); font-size: 12px; font-weight: 700; line-height: 1.6; }
+    .main { min-width: 0; padding: 22px; }
+    .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 18px; }
+    .title h2 { margin: 0; font-size: 28px; line-height: 1.15; }
+    .title p { margin: 7px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
     .toolbar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
-    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 36px; border: 2px solid #111; border-radius: 8px; background: white; padding: 0 12px; font-size: 13px; font-weight: 900; text-decoration: none; }
-    .btn.primary { background: var(--yellow); }
-    .hero { margin-top: 24px; display: grid; gap: 18px; grid-template-columns: 1.2fr .8fr; }
-    .card { border: 3px solid var(--line); background: var(--panel); border-radius: 10px; padding: 20px; box-shadow: 4px 4px 0 #111; }
-    .card.dark { background: #111; color: white; }
-    .eyebrow { margin: 0 0 8px; font-size: 12px; font-weight: 1000; color: var(--muted); text-transform: uppercase; }
-    .dark .eyebrow { color: rgba(255,255,255,.7); }
-    .headline { margin: 0; font-size: clamp(30px, 4vw, 54px); line-height: 1; letter-spacing: 0; }
-    .sub { margin: 14px 0 0; color: #333; font-weight: 750; line-height: 1.7; }
-    .dark .sub { color: rgba(255,255,255,.78); }
-    .metrics { margin-top: 22px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-    .metric { border: 3px solid #111; border-radius: 10px; background: white; padding: 16px; min-height: 118px; }
-    .metric strong { display: block; font-size: 34px; line-height: 1; }
-    .metric span { display: block; margin-top: 10px; color: var(--muted); font-weight: 900; font-size: 13px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 34px; border: 1px solid var(--line-strong); border-radius: 6px; background: white; padding: 0 11px; font-size: 13px; font-weight: 850; text-decoration: none; }
+    .btn.primary, .btn.active { border-color: var(--blue); background: var(--blue); color: white; }
+    .btn.subtle { background: transparent; }
+    .section { margin-top: 18px; }
+    .sectionHead { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin: 0 0 10px; }
+    .sectionHead h3 { margin: 0; font-size: 18px; }
+    .sectionHead p { margin: 0; color: var(--muted); font-size: 12px; font-weight: 750; }
+    .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); padding: 16px; min-height: 112px; }
+    .metric strong { display: block; font-size: 30px; line-height: 1; }
+    .metric span { display: block; margin-top: 8px; color: var(--muted); font-weight: 800; font-size: 12px; }
+    .metric small { display: block; margin-top: 12px; color: var(--muted); font-weight: 750; font-size: 12px; }
     .metric.good strong { color: var(--green); }
     .metric.warn strong { color: var(--red); }
-    .grid { margin-top: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .tri { display: grid; grid-template-columns: 1.1fr .9fr .9fr; gap: 12px; }
+    .card { border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 16px; }
     .wide { grid-column: 1 / -1; }
-    h2 { margin: 0 0 14px; font-size: 22px; }
+    .card h3 { margin: 0 0 12px; font-size: 16px; }
+    .cardLead { margin: -4px 0 12px; color: var(--muted); font-size: 12px; font-weight: 750; line-height: 1.5; }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    th, td { border-top: 2px solid #111; padding: 10px 8px; text-align: left; vertical-align: top; }
-    th { font-size: 12px; color: #555; text-transform: uppercase; }
+    th, td { border-top: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+    th { font-size: 11px; color: var(--muted); text-transform: uppercase; }
     .path { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
-    .pill { display: inline-block; border: 2px solid #111; border-radius: 999px; padding: 3px 8px; background: var(--yellow); font-size: 12px; font-weight: 900; }
+    .pill { display: inline-block; border-radius: 999px; padding: 4px 8px; background: var(--blue-soft); color: var(--blue); font-size: 12px; font-weight: 850; }
+    .status { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 850; white-space: nowrap; }
+    .status.done { background: var(--green-soft); color: var(--green); }
+    .status.wait { background: #fff5dc; color: #8a5b00; }
+    .status.opt { background: #eeeafa; color: var(--purple); }
     .actions { margin: 0; padding-left: 18px; }
-    .actions li { margin: 0 0 10px; font-weight: 800; line-height: 1.55; }
+    .actions li { margin: 0 0 9px; font-weight: 750; line-height: 1.55; }
     .empty { color: var(--muted); font-weight: 800; }
-    .barrow { display: grid; grid-template-columns: 110px 1fr 52px; align-items: center; gap: 10px; margin: 10px 0; font-size: 13px; font-weight: 850; }
-    .bar { height: 14px; border: 2px solid #111; border-radius: 999px; background: white; overflow: hidden; }
+    .bars { display: grid; gap: 10px; }
+    .barrow { display: grid; grid-template-columns: 96px 1fr 132px; align-items: center; gap: 10px; font-size: 12px; font-weight: 800; }
+    .bar { height: 12px; border-radius: 999px; background: #e8ecf3; overflow: hidden; }
     .fill { height: 100%; background: var(--blue); }
-    footer { margin: 24px 0 6px; color: var(--muted); font-size: 12px; font-weight: 800; text-align: center; }
-    @media (max-width: 900px) {
-      .hero, .grid { grid-template-columns: 1fr; }
+    .todo { display: grid; gap: 8px; }
+    .todoItem { display: grid; grid-template-columns: 96px 1fr auto; gap: 10px; align-items: start; border-top: 1px solid var(--line); padding: 10px 0; }
+    .todoArea { color: var(--muted); font-size: 12px; font-weight: 850; }
+    .todoTitle { font-size: 13px; font-weight: 900; }
+    .todoDesc { margin-top: 3px; color: var(--muted); font-size: 12px; font-weight: 700; line-height: 1.45; }
+    .sourceGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    .source { border: 1px solid var(--line); border-radius: 8px; padding: 12px; background: #fbfcff; }
+    .source b { display: block; font-size: 13px; margin-bottom: 4px; }
+    .source code { display: inline-block; margin: 3px 0 8px; color: var(--blue); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; }
+    .source p { margin: 0; color: var(--muted); font-size: 12px; font-weight: 700; line-height: 1.5; }
+    footer { margin: 22px 0 4px; color: var(--muted); font-size: 12px; font-weight: 750; text-align: center; }
+    @media (max-width: 1100px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: static; height: auto; }
+      .sideMeta { position: static; margin-top: 18px; }
+      .tri, .grid { grid-template-columns: 1fr; }
       .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .sourceGrid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 560px) {
-      .shell { padding: 12px; }
       .topbar { align-items: flex-start; flex-direction: column; }
       .toolbar { justify-content: flex-start; }
       .metrics { grid-template-columns: 1fr; }
+      .sourceGrid { grid-template-columns: 1fr; }
+      .todoItem { grid-template-columns: 1fr; }
       table { font-size: 12px; }
       th, td { padding: 8px 6px; }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar">
+  <div class="app">
+    <aside class="sidebar">
       <div class="brand">
         <div class="mark">GEO</div>
         <div>
           <h1>ManyAItools GEO 监控</h1>
-          <p>每天对账：访问、来源、页面转化、联系点击</p>
+          <p>内部运营看板</p>
         </div>
       </div>
-      <nav class="toolbar">
-        <a class="btn primary" href="/">刷新数据</a>
-        <a class="btn" href="https://manyaitool.com/work-with-me" target="_blank" rel="noreferrer">业务页</a>
-        <a class="btn" href="https://manyaitool.com/llms.txt" target="_blank" rel="noreferrer">llms.txt</a>
-        <a class="btn" href="/api/summary">JSON</a>
+      <nav class="nav">
+        <a class="active" href="#overview">总览</a>
+        <a href="#trend">趋势</a>
+        <a href="#worklog">已完成</a>
+        <a href="#sources">数据源</a>
+        <a href="#pages">页面转化</a>
+        <a href="#events">最新日志</a>
       </nav>
-    </header>
+      <div class="sideMeta">
+        数据库：manyaitool-geo-analytics<br>
+        当前范围：最近 ${escapeHtml(String(data.rangeDays))} 天<br>
+        更新：${escapeHtml(formatShanghai(data.generatedAt))}
+      </div>
+    </aside>
 
-    <section class="hero">
-      <article class="card dark">
-        <p class="eyebrow">今日效果</p>
-        <h2 class="headline">${escapeHtml(String(today.page_views))} 次访问，${escapeHtml(String(today.contact_clicks))} 次联系点击</h2>
-        <p class="sub">今日联系转化率 ${escapeHtml(rate(today.contact_clicks, today.page_views))}。最近 7 天联系转化率 ${escapeHtml(rate(period.contact_clicks, period.page_views))}。</p>
-      </article>
-      <article class="card">
-        <p class="eyebrow">今天该看什么</p>
-        <ul class="actions">${data.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-      </article>
-    </section>
+    <main class="main">
+      <header class="topbar" id="overview">
+        <div class="title">
+          <h2>GEO 效果 dashboard</h2>
+          <p>看我们做了什么、现在数据在哪里、趋势有没有变化。当前数据来自 D1 第一方埋点。</p>
+        </div>
+        <nav class="toolbar">
+          ${rangeLink(1, data.rangeDays)}
+          ${rangeLink(7, data.rangeDays)}
+          ${rangeLink(14, data.rangeDays)}
+          ${rangeLink(30, data.rangeDays)}
+          <a class="btn subtle" href="https://manyaitool.com/work-with-me" target="_blank" rel="noreferrer">业务页</a>
+          <a class="btn subtle" href="/api/summary?days=${escapeHtml(String(data.rangeDays))}">JSON</a>
+        </nav>
+      </header>
 
-    <section class="metrics">
-      ${metric("今日访问", today.page_views)}
-      ${metric("今日联系", today.contact_clicks, today.contact_clicks > 0 ? "good" : "warn")}
-      ${metric("今日外链", today.outbound_clicks)}
-      ${metric("联系转化率", rate(today.contact_clicks, today.page_views), today.contact_clicks > 0 ? "good" : "warn")}
-      ${metric("7天访问", period.page_views)}
-      ${metric("7天联系", period.contact_clicks, period.contact_clicks > 0 ? "good" : "warn")}
-      ${metric("访问页面", period.viewed_pages)}
-      ${metric("来源域名", period.referrer_hosts)}
-    </section>
+      <section class="metrics">
+        ${metric("今日访问", today.page_views, "", "今天真实 page_view")}
+        ${metric("今日联系", today.contact_clicks, today.contact_clicks > 0 ? "good" : "warn", "click_contact_*")}
+        ${metric("今日外链", today.outbound_clicks, "", "click_outbound")}
+        ${metric("今日联系转化率", rate(today.contact_clicks, today.page_views), today.contact_clicks > 0 ? "good" : "warn", "联系点击 / 页面访问")}
+        ${metric(`${data.rangeDays}天访问`, period.page_views, "", "所选周期 page_view")}
+        ${metric(`${data.rangeDays}天联系`, period.contact_clicks, period.contact_clicks > 0 ? "good" : "warn", "所选周期联系点击")}
+        ${metric("访问页面", period.viewed_pages, "", "去重 path")}
+        ${metric("来源域名", period.referrer_hosts, "", "去重 referrer_host")}
+      </section>
 
-    <section class="grid">
-      <article class="card wide">
-        <h2>7 天趋势</h2>
-        ${renderTrend(data.trend)}
-      </article>
+      <section class="section tri">
+        <article class="card" id="trend">
+          <h3>${data.rangeDays} 天趋势</h3>
+          <p class="cardLead">蓝色为页面访问，表内同时列联系点击和外链点击。</p>
+          ${renderTrend(data.trend)}
+        </article>
+        <article class="card">
+          <h3>今天该看什么</h3>
+          <ul class="actions">${data.actions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+        </article>
+        <article class="card">
+          <h3>当前数据在哪里</h3>
+          <p class="cardLead">不是只有今日卡片，下面这些入口都能查原始数据或汇总数据。</p>
+          <div class="todo">
+            <div class="todoItem"><div class="todoArea">线上</div><div><div class="todoTitle">本 dashboard</div><div class="todoDesc">https://geo-monitor.manyaitool.com</div></div>${status("已上线")}</div>
+            <div class="todoItem"><div class="todoArea">API</div><div><div class="todoTitle">JSON 数据</div><div class="todoDesc">/api/summary?days=${escapeHtml(String(data.rangeDays))}</div></div>${status("已接入")}</div>
+            <div class="todoItem"><div class="todoArea">本地</div><div><div class="todoTitle">日报</div><div class="todoDesc">manyaitool-geo/reports/latest-ManyAItools第一方数据报告.md</div></div>${status("已接入")}</div>
+          </div>
+        </article>
+      </section>
 
-      <article class="card">
-        <h2>有访问但没联系的页面</h2>
-        ${topNoContact.length ? table(["页面", "访问", "外链"], topNoContact.map((row) => [code(row.path), row.page_views, row.outbound_clicks])) : `<p class="empty">暂无此类页面</p>`}
-      </article>
+      <section class="section" id="worklog">
+        <div class="sectionHead">
+          <h3>我们已经做了什么</h3>
+          <p>GEO 工程进度和缺口，不再靠口头记忆。</p>
+        </div>
+        <article class="card">
+          ${table(["模块", "事项", "状态", "说明"], workItems.map((row) => [row[0], row[1], status(row[2]), row[3]]))}
+        </article>
+      </section>
 
-      <article class="card">
-        <h2>来源域名</h2>
-        ${table(["来源", "事件"], data.referrers.map((row) => [row.label, row.events]))}
-      </article>
+      <section class="section" id="sources">
+        <div class="sectionHead">
+          <h3>数据源状态</h3>
+          <p>哪些数据已经接上，哪些还缺一次授权或预算。</p>
+        </div>
+        <div class="sourceGrid">
+          ${dataSources.map((source) => `<div class="source"><b>${escapeHtml(source[0])}</b><code>${escapeHtml(source[1])}</code>${status(source[2])}<p>${escapeHtml(source[3])}</p></div>`).join("")}
+        </div>
+      </section>
 
-      <article class="card">
-        <h2>页面转化</h2>
-        ${table(["页面", "访问", "联系", "外链", "转化率"], data.pages.map((row) => [code(row.path), row.page_views, row.contact_clicks, row.outbound_clicks, `${row.contact_rate_percent}%`]))}
-      </article>
+      <section class="section grid" id="pages">
+        <article class="card">
+          <h3>页面转化</h3>
+          ${table(["页面", "访问", "联系", "外链", "转化率"], data.pages.map((row) => [code(row.path), row.page_views, row.contact_clicks, row.outbound_clicks, `${row.contact_rate_percent}%`]))}
+        </article>
 
-      <article class="card">
-        <h2>国家 / 地区</h2>
-        ${table(["国家", "事件"], data.countries.map((row) => [row.label, row.events]))}
-      </article>
+        <article class="card">
+          <h3>有访问但没联系的页面</h3>
+          ${topNoContact.length ? table(["页面", "访问", "外链"], topNoContact.map((row) => [code(row.path), row.page_views, row.outbound_clicks])) : `<p class="empty">暂无此类页面</p>`}
+        </article>
 
-      <article class="card wide">
-        <h2>最新日志</h2>
-        ${table(
-          ["时间", "事件", "页面", "来源", "地区", "浏览器"],
-          data.latest.map((row) => [
-            formatShanghai(row.created_at),
-            `<span class="pill">${escapeHtml(row.event_type)}</span>`,
-            code(row.path),
-            row.referrer_host,
-            row.country,
-            row.browser,
-          ]),
-        )}
-      </article>
-    </section>
+        <article class="card">
+          <h3>来源域名</h3>
+          ${table(["来源", "事件"], data.referrers.map((row) => [row.label, row.events]))}
+        </article>
 
-    <footer>生成时间：${escapeHtml(formatShanghai(data.generatedAt))} · 数据源：Cloudflare D1 manyaitool-geo-analytics</footer>
+        <article class="card">
+          <h3>国家 / 地区</h3>
+          ${table(["国家", "事件"], data.countries.map((row) => [row.label, row.events]))}
+        </article>
+      </section>
+
+      <section class="section" id="events">
+        <div class="sectionHead">
+          <h3>最新日志</h3>
+          <p>最近 50 条事件，方便确认埋点是否还活着。</p>
+        </div>
+        <article class="card">
+          ${table(
+            ["时间", "事件", "页面", "来源", "地区", "浏览器"],
+            data.latest.map((row) => [
+              formatShanghai(row.created_at),
+              `<span class="pill">${escapeHtml(row.event_type)}</span>`,
+              code(row.path),
+              row.referrer_host,
+              row.country,
+              row.browser,
+            ]),
+          )}
+        </article>
+      </section>
+
+      <footer>生成时间：${escapeHtml(formatShanghai(data.generatedAt))} · 数据源：Cloudflare D1 manyaitool-geo-analytics</footer>
+    </main>
   </div>
 </body>
 </html>`;
@@ -400,6 +509,14 @@ function buildActions(today: SummaryRow, period: SummaryRow, pages: PageRow[]): 
     actions.push("今天没有明显异常：继续看 Top 页面、来源域名和联系转化率。");
   }
   return actions;
+}
+
+function parseDays(value: string | null): number {
+  const parsed = Number(value);
+  if ([1, 7, 14, 30].includes(parsed)) {
+    return parsed;
+  }
+  return 7;
 }
 
 async function first<T>(env: Env, sql: string): Promise<T | null> {
@@ -448,8 +565,17 @@ function normalizeLabelCount(row: LabelCountRow): LabelCountRow {
   };
 }
 
-function metric(label: string, value: string | number, state = ""): string {
-  return `<div class="metric ${state}"><strong>${escapeHtml(String(value))}</strong><span>${escapeHtml(label)}</span></div>`;
+function metric(label: string, value: string | number, state = "", note = ""): string {
+  return `<div class="metric ${state}"><strong>${escapeHtml(String(value))}</strong><span>${escapeHtml(label)}</span>${note ? `<small>${escapeHtml(note)}</small>` : ""}</div>`;
+}
+
+function status(value: string): string {
+  const cls = value === "已上线" || value === "已接入" ? "done" : value === "待接入" ? "wait" : "opt";
+  return `<span class="status ${cls}">${escapeHtml(value)}</span>`;
+}
+
+function rangeLink(days: number, activeDays: number): string {
+  return `<a class="btn ${days === activeDays ? "active" : "subtle"}" href="/?days=${days}">${days === 1 ? "今天" : `${days}天`}</a>`;
 }
 
 function table(headers: string[], rows: Array<Array<string | number>>): string {
@@ -466,12 +592,12 @@ function renderTrend(rows: TrendRow[]): string {
     return `<p class="empty">暂无趋势数据</p>`;
   }
   const max = Math.max(...rows.map((row) => row.page_views), 1);
-  return rows
+  return `<div class="bars">${rows
     .map((row) => {
       const width = Math.max(3, Math.round((row.page_views / max) * 100));
-      return `<div class="barrow"><span>${escapeHtml(row.day)}</span><div class="bar"><div class="fill" style="width:${width}%"></div></div><strong>${row.page_views}</strong></div>`;
+      return `<div class="barrow"><span>${escapeHtml(row.day)}</span><div class="bar"><div class="fill" style="width:${width}%"></div></div><strong>PV ${row.page_views} · C ${row.contact_clicks} · O ${row.outbound_clicks}</strong></div>`;
     })
-    .join("");
+    .join("")}</div>`;
 }
 
 function code(value: string): string {
