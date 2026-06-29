@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { GeoAnalytics } from "@/components/analytics/GeoAnalytics";
 import { SiteChrome } from "@/components/site/SiteChrome";
 import { ToastProvider } from "@/components/ui/Toast";
 import { CommandPalette } from "@/components/CommandPalette";
@@ -38,6 +39,7 @@ export default function RootLayout({
     <html lang="en" className={`h-full antialiased ${onest.variable}`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-[#FFFDF7] text-[#0b0b0b] font-sans">
         <ToastProvider>
+          <GeoAnalytics />
           <CommandPalette />
           <SiteChrome>{children}</SiteChrome>
         </ToastProvider>
