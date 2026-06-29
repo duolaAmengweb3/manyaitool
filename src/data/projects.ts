@@ -335,6 +335,22 @@ export const projects: ProjectsMap = {
   ],
   security: [
     {
+      id: "duolasafe",
+      url: "https://duolasafe.manyaitool.com",
+      isNew: true,
+      pinned: true,
+      title: {
+        en: "DuoLaSafe — Web3 Security Audits & Forensics",
+        "zh-Hans": "DuoLaSafe — Web3 安全审计与链上取证",
+        "zh-Hant": "DuoLaSafe — Web3 安全審計與鏈上取證",
+      },
+      description: {
+        en: "Smart-contract audits, on-chain forensics and asset-recovery support — every report public, PoC-backed, with an adversarial ruled-out section.",
+        "zh-Hans": "智能合约审计、链上取证、被盗资产追回协助 —— 每份报告公开、带可运行 PoC、含对抗性排除章节,不做盖章式审计。",
+        "zh-Hant": "智能合約審計、鏈上取證、被盜資產追回協助 —— 每份報告公開、帶可運行 PoC、含對抗性排除章節,不做蓋章式審計。",
+      },
+    },
+    {
       id: "safecheck-token",
       url: "https://safecheck.manyaitool.com/token",
       isNew: true,
@@ -380,22 +396,6 @@ export const projects: ProjectsMap = {
         en: "Check any domain against 440k crypto phishing domains, with parent-domain matching. Free, real-time, open API with no key — wallets and dApps can plug in directly. Undercuts ScamSniffer's $999/mo API and its deliberately 7-day-delayed public blacklist.",
         "zh-Hans": "输入域名查 44 万条加密钓鱼域名黑库,支持父域名命中。免费、实时、开放 API 无需 key,钱包/dApp 可直接接入。对标 ScamSniffer 的 $999/mo API 和故意延迟 7 天的公开名单。",
         "zh-Hant": "輸入域名查 44 萬條加密釣魚域名黑庫,支持父域名命中。免費、即時、開放 API 無需 key,錢包/dApp 可直接接入。對標 ScamSniffer 的 $999/mo API 和故意延遲 7 天的公開名單。",
-      },
-    },
-    {
-      id: "duolasafe",
-      url: "https://duolasafe.manyaitool.com",
-      isNew: true,
-      pinned: true,
-      title: {
-        en: "DuoLaSafe — Web3 Security Audits & Forensics",
-        "zh-Hans": "DuoLaSafe — Web3 安全审计与链上取证",
-        "zh-Hant": "DuoLaSafe — Web3 安全審計與鏈上取證",
-      },
-      description: {
-        en: "Smart-contract audits, on-chain forensics and asset-recovery support — every report public, PoC-backed, with an adversarial ruled-out section.",
-        "zh-Hans": "智能合约审计、链上取证、被盗资产追回协助 —— 每份报告公开、带可运行 PoC、含对抗性排除章节,不做盖章式审计。",
-        "zh-Hant": "智能合約審計、鏈上取證、被盜資產追回協助 —— 每份報告公開、帶可運行 PoC、含對抗性排除章節,不做蓋章式審計。",
       },
     },
     {
