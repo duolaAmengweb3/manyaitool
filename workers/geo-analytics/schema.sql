@@ -27,3 +27,20 @@ CREATE INDEX IF NOT EXISTS idx_geo_events_path_created_at
 
 CREATE INDEX IF NOT EXISTS idx_geo_events_referrer_host_created_at
   ON geo_events(referrer_host, created_at);
+
+CREATE TABLE IF NOT EXISTS geo_daily_metrics (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  day TEXT NOT NULL,
+  metric TEXT NOT NULL,
+  dimension TEXT NOT NULL,
+  dimension_value TEXT NOT NULL,
+  events INTEGER NOT NULL,
+  updated_at TEXT NOT NULL,
+  UNIQUE(day, metric, dimension, dimension_value)
+);
+
+CREATE INDEX IF NOT EXISTS idx_geo_daily_metrics_day
+  ON geo_daily_metrics(day);
+
+CREATE INDEX IF NOT EXISTS idx_geo_daily_metrics_metric_day
+  ON geo_daily_metrics(metric, day);

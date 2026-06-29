@@ -5,6 +5,7 @@ interface D1Database {
 interface D1PreparedStatement {
   bind(...values: unknown[]): D1PreparedStatement;
   run(): Promise<unknown>;
+  all<T = Record<string, unknown>>(): Promise<{ results?: T[] }>;
 }
 
 interface Env {
@@ -29,6 +30,11 @@ type GeoEventPayload = {
   target?: unknown;
   lang?: unknown;
   title?: unknown;
+};
+
+type MetricRow = {
+  dimension_value: string;
+  events: number;
 };
 
 const ALLOWED_HOSTS = new Set(["manyaitool.com", "www.manyaitool.com"]);
@@ -129,7 +135,15 @@ export default {
 
     return withCors(new Response(null, { status: 204 }));
   },
+
+  async scheduled(controller: ScheduledController, env: Env): Promise<void> {
+    await refreshDailyMetrics(env, previousUtcDay(controller.scheduledTime));
+  },
 };
+
+declare class ScheduledController {
+  scheduledTime: number;
+}
 
 function withCors(response: Response): Response {
   const headers = new Headers(response.headers);
@@ -231,4 +245,178 @@ function classifyBot(userAgent: string, verifiedBot?: boolean): string {
     return "Bot";
   }
   return "";
+}
+
+async function refreshDailyMetrics(env: Env, day: string): Promise<void> {
+  const updatedAt = new Date().toISOString();
+
+  await env.DB.prepare("DELETE FROM geo_daily_metrics WHERE day = ?").bind(day).run();
+
+  await insertMetricRows(env, day, "total_events", "all", updatedAt, [
+    {
+      dimension_value: "all",
+      events: await countForDay(env, day),
+    },
+  ]);
+
+  await insertMetricRows(
+    env,
+    day,
+    "events_by_type",
+    "event_type",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT event_type AS dimension_value, COUNT(*) AS events
+       FROM geo_events
+       WHERE date(datetime(created_at)) = ?
+       GROUP BY event_type
+       ORDER BY events DESC`,
+      day,
+    ),
+  );
+
+  await insertMetricRows(
+    env,
+    day,
+    "top_pages",
+    "path",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT path AS dimension_value, COUNT(*) AS events
+       FROM geo_events
+       WHERE event_type = 'page_view'
+         AND date(datetime(created_at)) = ?
+       GROUP BY path
+       ORDER BY events DESC
+       LIMIT 100`,
+      day,
+    ),
+  );
+
+  await insertMetricRows(
+    env,
+    day,
+    "referrers",
+    "referrer_host",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT COALESCE(NULLIF(referrer_host, ''), '(direct / unknown)') AS dimension_value,
+              COUNT(*) AS events
+       FROM geo_events
+       WHERE date(datetime(created_at)) = ?
+       GROUP BY COALESCE(NULLIF(referrer_host, ''), '(direct / unknown)')
+       ORDER BY events DESC
+       LIMIT 100`,
+      day,
+    ),
+  );
+
+  await insertMetricRows(
+    env,
+    day,
+    "countries",
+    "country",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT COALESCE(NULLIF(country, ''), '(unknown)') AS dimension_value,
+              COUNT(*) AS events
+       FROM geo_events
+       WHERE date(datetime(created_at)) = ?
+       GROUP BY COALESCE(NULLIF(country, ''), '(unknown)')
+       ORDER BY events DESC
+       LIMIT 100`,
+      day,
+    ),
+  );
+
+  await insertMetricRows(
+    env,
+    day,
+    "contact_clicks",
+    "event_target",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT event_type || ' ' || COALESCE(NULLIF(target, ''), '(empty)') AS dimension_value,
+              COUNT(*) AS events
+       FROM geo_events
+       WHERE event_type LIKE 'click_contact_%'
+         AND date(datetime(created_at)) = ?
+       GROUP BY event_type, COALESCE(NULLIF(target, ''), '(empty)')
+       ORDER BY events DESC
+       LIMIT 100`,
+      day,
+    ),
+  );
+
+  await insertMetricRows(
+    env,
+    day,
+    "outbound_clicks",
+    "target",
+    updatedAt,
+    await selectMetricRows(
+      env,
+      `SELECT COALESCE(NULLIF(target, ''), '(empty)') AS dimension_value,
+              COUNT(*) AS events
+       FROM geo_events
+       WHERE event_type = 'click_outbound'
+         AND date(datetime(created_at)) = ?
+       GROUP BY COALESCE(NULLIF(target, ''), '(empty)')
+       ORDER BY events DESC
+       LIMIT 100`,
+      day,
+    ),
+  );
+}
+
+async function countForDay(env: Env, day: string): Promise<number> {
+  const rows = await selectMetricRows(
+    env,
+    `SELECT 'all' AS dimension_value, COUNT(*) AS events
+     FROM geo_events
+     WHERE date(datetime(created_at)) = ?`,
+    day,
+  );
+  return rows[0]?.events ?? 0;
+}
+
+async function selectMetricRows(env: Env, sql: string, day: string): Promise<MetricRow[]> {
+  const result = await env.DB.prepare(sql).bind(day).all<MetricRow>();
+  return (result.results ?? []).map((row) => ({
+    dimension_value: String(row.dimension_value ?? ""),
+    events: Number(row.events ?? 0),
+  }));
+}
+
+async function insertMetricRows(
+  env: Env,
+  day: string,
+  metric: string,
+  dimension: string,
+  updatedAt: string,
+  rows: MetricRow[],
+): Promise<void> {
+  for (const row of rows) {
+    await env.DB.prepare(
+      `INSERT OR REPLACE INTO geo_daily_metrics (
+        day,
+        metric,
+        dimension,
+        dimension_value,
+        events,
+        updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?)`,
+    )
+      .bind(day, metric, dimension, row.dimension_value, row.events, updatedAt)
+      .run();
+  }
+}
+
+function previousUtcDay(scheduledTime: number): string {
+  return new Date(scheduledTime - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
 }

@@ -6,6 +6,9 @@
   "observability": {
     "enabled": true
   },
+  "triggers": {
+    "crons": ["15 0 * * *"]
+  },
   "routes": [
     {
       "pattern": "manyaitool.com/__geo_event*",
