@@ -291,6 +291,19 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
   const period = data.period;
   const cfTraffic = data.cfTraffic.summary;
   const topNoContact = data.pages.filter((page) => page.page_views > 0 && page.contact_clicks === 0).slice(0, 8);
+  const todayActions = [
+    ["站点", "上线 GEO 业务承接页", "已完成", "/about、/work-with-me、/ai-agent-development、/web3-tools-development、/case-studies 已部署。"],
+    ["AI 可读", "补齐 AI-readable 文件", "已完成", "sitemap、llms.txt、ai-index、schema、每页 markdown 已接入。"],
+    ["埋点", "上线第一方数据管道", "已完成", "Cloudflare Worker + D1 `geo_events` 记录 page_view、联系点击、外链点击。"],
+    ["日报", "生成 30 天中文日报", "已完成", "latest-ManyAItools第一方数据报告.md 已包含第一方转化和 CF 历史流量。"],
+    ["历史数据", "导入 Cloudflare 旧流量", "已完成", "2026-05-25 到 2026-06-29：173,827 requests、40,480 page views、13,011 daily uniques。"],
+    ["监控站", "上线中文 GEO dashboard", "已完成", "geo-monitor.manyaitool.com 已上线，读取 D1 和 CF 历史流量。"],
+    ["看板", "改成 SaaS dashboard", "已完成", "增加时间范围、趋势、数据源、页面转化、最新日志、CF 历史流量。"],
+    ["访问", "取消账号密码", "已完成", "删除 Basic Auth、Cloudflare secret 和本地凭据文件，现在直接打开 URL。"],
+    ["验证", "线上接口验证", "已完成", "页面 200、/api/summary?days=30 200、/health 200。"],
+    ["代码", "推送 GitHub main", "已完成", "监控站、CF 导入脚本、日报脚本和认证移除代码已推送。"],
+    ["文档", "更新上线记录和 README", "已完成", "manyaitool-geo 文档已记录 dashboard、CF 历史流量、公开访问状态。"],
+  ];
   const workItems = [
     ["数据管道", "Cloudflare Worker + D1 第一方埋点", "已上线", "记录页面访问、来源域名、国家、联系点击、外链点击。"],
     ["自动汇总", "Worker cron + geo_daily_metrics", "已上线", "每天 UTC 00:15 汇总前一天事件，便于周报/月报。"],
@@ -436,6 +449,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
       </div>
       <nav class="nav">
         <a class="active" href="#overview">总览</a>
+        <a href="#today-actions">今日动作</a>
         <a href="#trend">趋势</a>
         <a href="#cf-history">CF 历史</a>
         <a href="#worklog">已完成</a>
@@ -475,6 +489,16 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
         ${metric(`${data.rangeDays}天联系`, period.contact_clicks, period.contact_clicks > 0 ? "good" : "warn", "所选周期联系点击")}
         ${metric("访问页面", period.viewed_pages, "", "去重 path")}
         ${metric("来源域名", period.referrer_hosts, "", "去重 referrer_host")}
+      </section>
+
+      <section class="section" id="today-actions">
+        <div class="sectionHead">
+          <h3>今天做了什么动作</h3>
+          <p>2026-06-29，当天工程动作和验证结果。</p>
+        </div>
+        <article class="card">
+          ${table(["模块", "动作", "状态", "结果"], todayActions.map((row) => [row[0], row[1], status(row[2]), row[3]]))}
+        </article>
       </section>
 
       <section class="section tri">
@@ -709,7 +733,7 @@ function metric(label: string, value: string | number, state = "", note = ""): s
 }
 
 function status(value: string): string {
-  const cls = value === "已上线" || value === "已接入" ? "done" : value === "待接入" ? "wait" : "opt";
+  const cls = value === "已上线" || value === "已接入" || value === "已完成" ? "done" : value === "待接入" ? "wait" : "opt";
   return `<span class="status ${cls}">${escapeHtml(value)}</span>`;
 }
 
