@@ -351,6 +351,54 @@ export const projects: ProjectsMap = {
       },
     },
     {
+      id: "safecheck-trace",
+      url: "https://safecheck.manyaitool.com/trace",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Stolen-Fund Tracer — where did the money go?",
+        "zh-Hans": "链上资金追踪器 — 被盗的钱追到哪了",
+        "zh-Hant": "鏈上資金追蹤器 — 被盜的錢追到哪了",
+      },
+      description: {
+        en: "Paste a hacked address and trace the funds hop by hop. Our in-house intel DB labels every hop — and pinpoints when the loot lands in an exchange deposit address (a freezable endpoint) or hits a mixer (trace breakpoint). The first concrete step toward recovery, free.",
+        "zh-Hans": "输入被盗地址,逐跳追踪资金流向。自有情报库给每一跳打标,定位赃款落到哪个交易所充值地址(=可冻结点)还是进了混币器(追踪中断)。被盗追回的第一步,免费。",
+        "zh-Hant": "輸入被盜地址,逐跳追蹤資金流向。自有情報庫給每一跳打標,定位贓款落到哪個交易所充值地址(=可凍結點)還是進了混幣器(追蹤中斷)。被盜追回的第一步,免費。",
+      },
+    },
+    {
+      id: "safecheck-approvals",
+      url: "https://safecheck.manyaitool.com/approvals",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Wallet Approval Checkup — who can drain you?",
+        "zh-Hans": "钱包授权体检 — 谁能掏空你的钱包",
+        "zh-Hant": "錢包授權體檢 — 誰能掏空你的錢包",
+      },
+      description: {
+        en: "Most thefts trace back to one forgotten approval. Scan a wallet (read-only) for every live token approval and flag the unlimited ones — plus whether the spender is a known drainer / malicious contract, cross-checked against our intel DB and GoPlus. The part Revoke.cash won't tell you.",
+        "zh-Hans": "大多被盗都源于一笔忘了撤的授权。只读扫出钱包所有还生效的授权,标出无限额度,并判断 spender 是不是已知 drainer/恶意合约(查自有情报库 + GoPlus)——这是 Revoke.cash 不会告诉你的。",
+        "zh-Hant": "大多被盜都源於一筆忘了撤的授權。只讀掃出錢包所有還生效的授權,標出無限額度,並判斷 spender 是不是已知 drainer/惡意合約(查自有情報庫 + GoPlus)——這是 Revoke.cash 不會告訴你的。",
+      },
+    },
+    {
+      id: "safecheck-xray",
+      url: "https://safecheck.manyaitool.com/xray",
+      isNew: true,
+      launchedAt: "2026-06-29",
+      title: {
+        en: "Token X-ray — honeypot & rug deep check",
+        "zh-Hans": "代币深度安检 — 貔貅 / Rug 检测",
+        "zh-Hant": "代幣深度安檢 — 貔貅 / Rug 檢測",
+      },
+      description: {
+        en: "Paste any token contract for a real on-chain check: honeypot buy/sell simulation, taxes, mint/freeze powers, proxy upgradability — plus deployer reputation against our intel DB (the serial-rugger signal GoPlus misses). Green / yellow / red at a glance; known stablecoins won't false-positive.",
+        "zh-Hans": "粘贴任意代币合约,真链上分析:貔貅买卖模拟、买卖税、增发/冻结权限、proxy 可升级性,再用自有情报库查部署者信誉(GoPlus 漏报的连环 rugger 信号)。绿/黄/红一眼看清,官方稳定币不会误报。",
+        "zh-Hant": "貼上任意代幣合約,真鏈上分析:貔貅買賣模擬、買賣稅、增發/凍結權限、proxy 可升級性,再用自有情報庫查部署者信譽(GoPlus 漏報的連環 rugger 信號)。綠/黃/紅一眼看清,官方穩定幣不會誤報。",
+      },
+    },
+    {
       id: "safecheck-token",
       url: "https://safecheck.manyaitool.com/token",
       isNew: true,
