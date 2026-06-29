@@ -12,9 +12,6 @@
       "custom_domain": true
     }
   ],
-  "vars": {
-    "MONITOR_USER": "duola"
-  },
   "d1_databases": [
     {
       "binding": "DB",

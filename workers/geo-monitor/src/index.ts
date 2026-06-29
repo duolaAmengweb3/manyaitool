@@ -10,8 +10,6 @@ interface D1PreparedStatement {
 
 interface Env {
   DB: D1Database;
-  MONITOR_USER?: string;
-  MONITOR_PASSWORD?: string;
 }
 
 type SummaryRow = {
@@ -88,10 +86,6 @@ export default {
 
     if (url.pathname === "/health") {
       return Response.json({ ok: true, service: "manyaitool-geo-monitor" });
-    }
-
-    if (!isAuthorized(request, env)) {
-      return unauthorized();
     }
 
     const days = parseDays(url.searchParams.get("days"));
@@ -792,47 +786,6 @@ function formatShanghai(value: string): string {
     second: "2-digit",
     hour12: false,
   }).format(date);
-}
-
-function isAuthorized(request: Request, env: Env): boolean {
-  const password = env.MONITOR_PASSWORD;
-  if (!password) return false;
-
-  const header = request.headers.get("Authorization");
-  if (!header?.startsWith("Basic ")) return false;
-
-  let decoded = "";
-  try {
-    decoded = atob(header.slice("Basic ".length));
-  } catch {
-    return false;
-  }
-
-  const splitAt = decoded.indexOf(":");
-  if (splitAt < 0) return false;
-
-  const user = decoded.slice(0, splitAt);
-  const pass = decoded.slice(splitAt + 1);
-  return safeEqual(user, env.MONITOR_USER ?? "duola") && safeEqual(pass, password);
-}
-
-function safeEqual(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let result = 0;
-  for (let i = 0; i < a.length; i += 1) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-  return result === 0;
-}
-
-function unauthorized(): Response {
-  return new Response("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="ManyAItools GEO Monitor", charset="UTF-8"',
-      "Cache-Control": "no-store",
-    },
-  });
 }
 
 function escapeHtml(value: string): string {
