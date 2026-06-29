@@ -52,6 +52,36 @@ type LatestEventRow = {
   created_at: string;
 };
 
+type CfTrafficSummaryRow = {
+  requests: number;
+  visits: number;
+  page_views: number;
+  uniques: number;
+  edge_response_bytes: number;
+  hosts: number;
+  days: number;
+  latest_day: string;
+  updated_at: string;
+};
+
+type CfTrafficTrendRow = {
+  day: string;
+  requests: number;
+  visits: number;
+  page_views: number;
+  uniques: number;
+  edge_response_bytes: number;
+};
+
+type CfTrafficHostRow = {
+  host: string;
+  requests: number;
+  visits: number;
+  page_views: number;
+  uniques: number;
+  edge_response_bytes: number;
+};
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
@@ -87,7 +117,7 @@ export default {
 
 async function loadDashboardData(env: Env, days: number) {
   const range = `-${days} days`;
-  const [today, period, trend, pages, referrers, countries, latest] = await Promise.all([
+  const [today, period, trend, pages, referrers, countries, latest, cfSummary, cfTrend, cfHosts] = await Promise.all([
     first<SummaryRow>(
       env,
       `SELECT
@@ -186,6 +216,51 @@ async function loadDashboardData(env: Env, days: number) {
        ORDER BY id DESC
        LIMIT 50`,
     ),
+    first<CfTrafficSummaryRow>(
+      env,
+      `SELECT
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(visits), 0) AS visits,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques,
+        COALESCE(SUM(edge_response_bytes), 0) AS edge_response_bytes,
+        COUNT(DISTINCT host) AS hosts,
+        COUNT(DISTINCT day) AS days,
+        COALESCE(MAX(day), '') AS latest_day,
+        COALESCE(MAX(updated_at), '') AS updated_at
+       FROM cf_daily_traffic
+       WHERE date(day) >= date('now', '${range}')`,
+    ),
+    all<CfTrafficTrendRow>(
+      env,
+      `SELECT
+        day,
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(visits), 0) AS visits,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques,
+        COALESCE(SUM(edge_response_bytes), 0) AS edge_response_bytes
+       FROM cf_daily_traffic
+       WHERE date(day) >= date('now', '${range}')
+       GROUP BY day
+       ORDER BY day DESC
+       LIMIT ${days}`,
+    ),
+    all<CfTrafficHostRow>(
+      env,
+      `SELECT
+        host,
+        COALESCE(SUM(requests), 0) AS requests,
+        COALESCE(SUM(visits), 0) AS visits,
+        COALESCE(SUM(page_views), 0) AS page_views,
+        COALESCE(SUM(uniques), 0) AS uniques,
+        COALESCE(SUM(edge_response_bytes), 0) AS edge_response_bytes
+       FROM cf_daily_traffic
+       WHERE date(day) >= date('now', '${range}')
+       GROUP BY host
+       ORDER BY requests DESC
+       LIMIT 10`,
+    ),
   ]);
 
   const safeToday = normalizeSummary(today);
@@ -208,6 +283,11 @@ async function loadDashboardData(env: Env, days: number) {
       browser: row.browser ?? "",
       created_at: row.created_at ?? "",
     })),
+    cfTraffic: {
+      summary: normalizeCfTrafficSummary(cfSummary),
+      trend: cfTrend.map(normalizeCfTrafficTrend),
+      hosts: cfHosts.map(normalizeCfTrafficHost),
+    },
     actions: buildActions(safeToday, safePeriod, pages.map(normalizePage)),
   };
 }
@@ -215,10 +295,12 @@ async function loadDashboardData(env: Env, days: number) {
 function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): string {
   const today = data.today;
   const period = data.period;
+  const cfTraffic = data.cfTraffic.summary;
   const topNoContact = data.pages.filter((page) => page.page_views > 0 && page.contact_clicks === 0).slice(0, 8);
   const workItems = [
     ["数据管道", "Cloudflare Worker + D1 第一方埋点", "已上线", "记录页面访问、来源域名、国家、联系点击、外链点击。"],
     ["自动汇总", "Worker cron + geo_daily_metrics", "已上线", "每天 UTC 00:15 汇总前一天事件，便于周报/月报。"],
+    ["CF 旧数据", "Cloudflare GraphQL 历史流量导入", "已接入", "拉取 Cloudflare zone 级历史 requests、page views、daily uniques。"],
     ["公开 GEO", "5 个业务承接页 + 5 个 markdown 页", "已上线", "/about、/work-with-me、/ai-agent-development、/web3-tools-development、/case-studies。"],
     ["AI 可读", "sitemap / llms.txt / ai-index / schema", "已上线", "让搜索引擎和 AI answer engine 能发现服务页和案例页。"],
     ["对账", "中文 GEO 监控站", "已上线", "当前页面，读取 D1 实时数据。"],
@@ -228,6 +310,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
   const dataSources = [
     ["D1 原始事件", "geo_events", "已接入", "页面访问、点击、来源、国家、浏览器。"],
     ["D1 日汇总", "geo_daily_metrics", "已接入", "每天自动汇总，后续做长期趋势。"],
+    ["CF 历史流量", "cf_daily_traffic", "已接入", "Cloudflare 已有的 zone 级历史 requests、page views、daily uniques。"],
     ["JSON 接口", "/api/summary", "已接入", "当前看板同源 JSON 数据。"],
     ["本地日报", "manyaitool-geo/reports/latest-*.md", "已接入", "固定 Markdown 日报入口。"],
     ["GSC", "Search Console API", "待接入", "搜索 query、曝光、点击、CTR、排名。"],
@@ -290,6 +373,9 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
     .metric strong { display: block; font-size: 30px; line-height: 1; }
     .metric span { display: block; margin-top: 8px; color: var(--muted); font-weight: 800; font-size: 12px; }
     .metric small { display: block; margin-top: 12px; color: var(--muted); font-weight: 750; font-size: 12px; }
+    .miniMetrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+    .miniMetrics .metric { min-height: 88px; padding: 12px; }
+    .miniMetrics .metric strong { font-size: 24px; }
     .metric.good strong { color: var(--green); }
     .metric.warn strong { color: var(--red); }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -357,6 +443,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
       <nav class="nav">
         <a class="active" href="#overview">总览</a>
         <a href="#trend">趋势</a>
+        <a href="#cf-history">CF 历史</a>
         <a href="#worklog">已完成</a>
         <a href="#sources">数据源</a>
         <a href="#pages">页面转化</a>
@@ -373,7 +460,7 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
       <header class="topbar" id="overview">
         <div class="title">
           <h2>GEO 效果 dashboard</h2>
-          <p>看我们做了什么、现在数据在哪里、趋势有没有变化。当前数据来自 D1 第一方埋点。</p>
+          <p>看我们做了什么、现在数据在哪里、趋势有没有变化。当前同时展示 Cloudflare 历史流量和 D1 第一方转化埋点。</p>
         </div>
         <nav class="toolbar">
           ${rangeLink(1, data.rangeDays)}
@@ -414,6 +501,28 @@ function renderDashboard(data: Awaited<ReturnType<typeof loadDashboardData>>): s
             <div class="todoItem"><div class="todoArea">API</div><div><div class="todoTitle">JSON 数据</div><div class="todoDesc">/api/summary?days=${escapeHtml(String(data.rangeDays))}</div></div>${status("已接入")}</div>
             <div class="todoItem"><div class="todoArea">本地</div><div><div class="todoTitle">日报</div><div class="todoDesc">manyaitool-geo/reports/latest-ManyAItools第一方数据报告.md</div></div>${status("已接入")}</div>
           </div>
+        </article>
+      </section>
+
+      <section class="section grid" id="cf-history">
+        <article class="card">
+          <h3>Cloudflare 历史流量</h3>
+          <p class="cardLead">这是 CF 上已经存在的 zone 级 HTTP 统计，用来补历史趋势；它不包含联系点击和页面转化，也可能包含同一 zone 下的子域流量。</p>
+          <div class="miniMetrics">
+            ${metric(`${data.rangeDays}天 CF requests`, formatInt(cfTraffic.requests), "", "HTTP 请求量")}
+            ${metric(`${data.rangeDays}天 CF page views`, formatInt(cfTraffic.page_views), "", "Cloudflare pageViews")}
+            ${metric(`${data.rangeDays}天 daily uniques`, formatInt(cfTraffic.uniques), "", "每日 unique 累加")}
+            ${metric("导入天数", formatInt(cfTraffic.days), "", "cf_daily_traffic")}
+          </div>
+          ${renderCfTrend(data.cfTraffic.trend)}
+        </article>
+        <article class="card">
+          <h3>CF 数据口径</h3>
+          <p class="cardLead">旧数据来自 Cloudflare zone 每日聚合。它适合看历史流量有没有涨跌，不适合判断某个页面有没有带来咨询。</p>
+          ${table(
+            ["范围", "Requests", "Page views", "Daily uniques", "Bytes"],
+            data.cfTraffic.hosts.map((row) => [row.host, formatInt(row.requests), formatInt(row.page_views), formatInt(row.uniques), formatBytes(row.edge_response_bytes)]),
+          )}
         </article>
       </section>
 
@@ -548,6 +657,42 @@ function normalizeTrend(row: TrendRow): TrendRow {
   };
 }
 
+function normalizeCfTrafficSummary(row: CfTrafficSummaryRow | null): CfTrafficSummaryRow {
+  return {
+    requests: Number(row?.requests ?? 0),
+    visits: Number(row?.visits ?? 0),
+    page_views: Number(row?.page_views ?? 0),
+    uniques: Number(row?.uniques ?? 0),
+    edge_response_bytes: Number(row?.edge_response_bytes ?? 0),
+    hosts: Number(row?.hosts ?? 0),
+    days: Number(row?.days ?? 0),
+    latest_day: row?.latest_day ?? "",
+    updated_at: row?.updated_at ?? "",
+  };
+}
+
+function normalizeCfTrafficTrend(row: CfTrafficTrendRow): CfTrafficTrendRow {
+  return {
+    day: row.day ?? "",
+    requests: Number(row.requests ?? 0),
+    visits: Number(row.visits ?? 0),
+    page_views: Number(row.page_views ?? 0),
+    uniques: Number(row.uniques ?? 0),
+    edge_response_bytes: Number(row.edge_response_bytes ?? 0),
+  };
+}
+
+function normalizeCfTrafficHost(row: CfTrafficHostRow): CfTrafficHostRow {
+  return {
+    host: row.host ?? "",
+    requests: Number(row.requests ?? 0),
+    visits: Number(row.visits ?? 0),
+    page_views: Number(row.page_views ?? 0),
+    uniques: Number(row.uniques ?? 0),
+    edge_response_bytes: Number(row.edge_response_bytes ?? 0),
+  };
+}
+
 function normalizePage(row: PageRow): PageRow {
   return {
     path: row.path ?? "",
@@ -600,8 +745,33 @@ function renderTrend(rows: TrendRow[]): string {
     .join("")}</div>`;
 }
 
+function renderCfTrend(rows: CfTrafficTrendRow[]): string {
+  if (!rows.length) {
+    return `<p class="empty">暂无 Cloudflare 历史流量数据，先运行 npm run geo:cf-import。</p>`;
+  }
+  const max = Math.max(...rows.map((row) => row.requests), 1);
+  return `<div class="bars">${rows
+    .map((row) => {
+      const width = Math.max(3, Math.round((row.requests / max) * 100));
+      return `<div class="barrow"><span>${escapeHtml(row.day)}</span><div class="bar"><div class="fill" style="width:${width}%"></div></div><strong>R ${formatInt(row.requests)} · PV ${formatInt(row.page_views)} · U ${formatInt(row.uniques)}</strong></div>`;
+    })
+    .join("")}</div>`;
+}
+
 function code(value: string): string {
   return `<span class="path">${escapeHtml(value || "(empty)")}</span>`;
+}
+
+function formatInt(value: number): string {
+  return new Intl.NumberFormat("en-US").format(Number(value ?? 0));
+}
+
+function formatBytes(value: number): string {
+  const bytes = Number(value ?? 0);
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${(bytes / 1024 / 1024 / 1024).toFixed(1)} GB`;
 }
 
 function rate(numerator: number, denominator: number): string {

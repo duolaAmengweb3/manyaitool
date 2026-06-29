@@ -144,6 +144,28 @@ const queries = {
     ORDER BY id DESC
     LIMIT 20;
   `,
+  cfSummary: `
+    SELECT
+      COUNT(DISTINCT day) AS days,
+      MIN(day) AS first_day,
+      MAX(day) AS last_day,
+      COALESCE(SUM(requests), 0) AS requests,
+      COALESCE(SUM(page_views), 0) AS page_views,
+      COALESCE(SUM(uniques), 0) AS daily_uniques
+    FROM cf_daily_traffic
+    WHERE date(day) >= date('now', '-${Number.isFinite(days) ? days : DEFAULT_DAYS} days');
+  `,
+  cfDaily: `
+    SELECT
+      day,
+      requests,
+      page_views,
+      uniques AS daily_uniques
+    FROM cf_daily_traffic
+    WHERE date(day) >= date('now', '-${Number.isFinite(days) ? days : DEFAULT_DAYS} days')
+    ORDER BY day DESC
+    LIMIT 30;
+  `,
 };
 
 const data = Object.fromEntries(
@@ -201,6 +223,24 @@ const markdown = [
   "## 每日事件",
   "",
   tableFromRows(data.daily, ["day", "event_type", "events"]),
+  "",
+  "## Cloudflare 历史流量",
+  "",
+  "这块是 Cloudflare 已有的 zone 级历史访问数据，用来看旧趋势；联系点击和页面转化仍看第一方埋点。",
+  "",
+  table(
+    ["指标", "数值"],
+    [
+      ["导入天数", data.cfSummary[0]?.days ?? 0],
+      ["最早日期", data.cfSummary[0]?.first_day ?? ""],
+      ["最新日期", data.cfSummary[0]?.last_day ?? ""],
+      ["Requests", data.cfSummary[0]?.requests ?? 0],
+      ["Page views", data.cfSummary[0]?.page_views ?? 0],
+      ["Daily uniques", data.cfSummary[0]?.daily_uniques ?? 0],
+    ],
+  ),
+  "",
+  tableFromRows(data.cfDaily, ["day", "requests", "page_views", "daily_uniques"]),
   "",
   "## Top 页面",
   "",

@@ -44,3 +44,23 @@ CREATE INDEX IF NOT EXISTS idx_geo_daily_metrics_day
 
 CREATE INDEX IF NOT EXISTS idx_geo_daily_metrics_metric_day
   ON geo_daily_metrics(metric, day);
+
+CREATE TABLE IF NOT EXISTS cf_daily_traffic (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  day TEXT NOT NULL,
+  host TEXT NOT NULL,
+  requests INTEGER NOT NULL DEFAULT 0,
+  visits INTEGER NOT NULL DEFAULT 0,
+  page_views INTEGER NOT NULL DEFAULT 0,
+  uniques INTEGER NOT NULL DEFAULT 0,
+  edge_response_bytes INTEGER NOT NULL DEFAULT 0,
+  source TEXT NOT NULL DEFAULT 'cloudflare_graphql_httpRequests1dGroups',
+  updated_at TEXT NOT NULL,
+  UNIQUE(day, host, source)
+);
+
+CREATE INDEX IF NOT EXISTS idx_cf_daily_traffic_day
+  ON cf_daily_traffic(day);
+
+CREATE INDEX IF NOT EXISTS idx_cf_daily_traffic_host_day
+  ON cf_daily_traffic(host, day);
